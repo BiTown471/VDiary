@@ -1,0 +1,90 @@
+﻿@model VDiary.Models.User
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>User</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AlbumNumber" class="control-label"></label>
+                <input asp-for="AlbumNumber" class="form-control" />
+                <span asp-validation-for="AlbumNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AccountExpiryDays" class="control-label"></label>
+                <input asp-for="AccountExpiryDays" class="form-control" />
+                <span asp-validation-for="AccountExpiryDays" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaxLoginAttemps" class="control-label"></label>
+                <input asp-for="MaxLoginAttemps" class="form-control" />
+                <span asp-validation-for="MaxLoginAttemps" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FilledLoginAtemps" class="control-label"></label>
+                <input asp-for="FilledLoginAtemps" class="form-control" />
+                <span asp-validation-for="FilledLoginAtemps" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsDeleted" /> @Html.DisplayNameFor(model => model.IsDeleted)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Signature" class="control-label"></label>
+                <input asp-for="Signature" class="form-control" />
+                <span asp-validation-for="Signature" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RoleId" class="control-label"></label>
+                <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
+                <span asp-validation-for="RoleId" class="text-danger"></span>
+            </div>
+            @{Model.LastLoggedIn = Model.LastLoggedIn;}
+            @Html.HiddenFor(m => m.LastLoggedIn)
+            @{Model.DateCreated = Model.DateCreated;}
+            @Html.HiddenFor(m => m.DateCreated)
+            @{Model.DateResetRequest = Model.DateResetRequest;}
+            @Html.HiddenFor(m => m.DateResetRequest)
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
