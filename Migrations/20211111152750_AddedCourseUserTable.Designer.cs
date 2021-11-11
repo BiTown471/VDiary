@@ -3,36 +3,23 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VDiary.Data;
 
 namespace VDiary.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211111152750_AddedCourseUserTable")]
+    partial class AddedCourseUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.12")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("CourseUser", b =>
-                {
-                    b.Property<int>("CourseListId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersListId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CourseListId", "UsersListId");
-
-                    b.HasIndex("UsersListId");
-
-                    b.ToTable("CourseUser");
-                });
 
             modelBuilder.Entity("VDiary.Models.Course", b =>
                 {
@@ -65,6 +52,24 @@ namespace VDiary.Migrations
                     b.HasIndex("SubjectID");
 
                     b.ToTable("Course");
+                });
+
+            modelBuilder.Entity("VDiary.Models.CourseUser", b =>
+                {
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("CourseId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CourseUser");
                 });
 
             modelBuilder.Entity("VDiary.Models.Role", b =>
@@ -157,21 +162,6 @@ namespace VDiary.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("CourseUser", b =>
-                {
-                    b.HasOne("VDiary.Models.Course", null)
-                        .WithMany()
-                        .HasForeignKey("CourseListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VDiary.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("VDiary.Models.Course", b =>
                 {
                     b.HasOne("VDiary.Models.Subject", "Subject")
@@ -183,6 +173,25 @@ namespace VDiary.Migrations
                     b.Navigation("Subject");
                 });
 
+            modelBuilder.Entity("VDiary.Models.CourseUser", b =>
+                {
+                    b.HasOne("VDiary.Models.Course", "Course")
+                        .WithMany("UsersList")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VDiary.Models.User", "User")
+                        .WithMany("CourseList")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("VDiary.Models.User", b =>
                 {
                     b.HasOne("VDiary.Models.Role", "Role")
@@ -192,6 +201,16 @@ namespace VDiary.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("VDiary.Models.Course", b =>
+                {
+                    b.Navigation("UsersList");
+                });
+
+            modelBuilder.Entity("VDiary.Models.User", b =>
+                {
+                    b.Navigation("CourseList");
                 });
 #pragma warning restore 612, 618
         }

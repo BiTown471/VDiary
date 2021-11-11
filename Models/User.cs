@@ -36,6 +36,6 @@ namespace VDiary.Models
         public int RoleId { get; set; }
         public virtual Role Role { get; set; }
         
-        public virtual ICollection<Course> Courses { get; set; }
+        public virtual ICollection<Course> CourseList { get; set; }
     }
 }

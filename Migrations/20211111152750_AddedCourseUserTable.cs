@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace VDiary.Migrations
 {
-    public partial class coursemanytomanyuser : Migration
+    public partial class AddedCourseUserTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -93,21 +93,22 @@ namespace VDiary.Migrations
                 name: "CourseUser",
                 columns: table => new
                 {
-                    CoursesId = table.Column<int>(type: "int", nullable: false),
-                    UsersId = table.Column<int>(type: "int", nullable: false)
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CourseUser", x => new { x.CoursesId, x.UsersId });
+                    table.PrimaryKey("PK_CourseUser", x => new { x.CourseId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_CourseUser_Course_CoursesId",
-                        column: x => x.CoursesId,
+                        name: "FK_CourseUser_Course_CourseId",
+                        column: x => x.CourseId,
                         principalTable: "Course",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CourseUser_User_UsersId",
-                        column: x => x.UsersId,
+                        name: "FK_CourseUser_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -119,9 +120,9 @@ namespace VDiary.Migrations
                 column: "SubjectID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CourseUser_UsersId",
+                name: "IX_CourseUser_UserId",
                 table: "CourseUser",
-                column: "UsersId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_RoleId",

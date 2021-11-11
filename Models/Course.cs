@@ -26,6 +26,6 @@ namespace VDiary.Models
 
         
         
-        public virtual ICollection<User> Users { get; set; }
+        public virtual ICollection<User> UsersList { get; set; }
     }
 }

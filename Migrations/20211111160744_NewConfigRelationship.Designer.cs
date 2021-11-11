@@ -10,8 +10,8 @@ using VDiary.Data;
 namespace VDiary.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211111105938_course many to many user ")]
-    partial class coursemanytomanyuser
+    [Migration("20211111160744_NewConfigRelationship")]
+    partial class NewConfigRelationship
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,15 +23,15 @@ namespace VDiary.Migrations
 
             modelBuilder.Entity("CourseUser", b =>
                 {
-                    b.Property<int>("CoursesId")
+                    b.Property<int>("CourseListId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersId")
+                    b.Property<int>("UsersListId")
                         .HasColumnType("int");
 
-                    b.HasKey("CoursesId", "UsersId");
+                    b.HasKey("CourseListId", "UsersListId");
 
-                    b.HasIndex("UsersId");
+                    b.HasIndex("UsersListId");
 
                     b.ToTable("CourseUser");
                 });
@@ -163,13 +163,13 @@ namespace VDiary.Migrations
                 {
                     b.HasOne("VDiary.Models.Course", null)
                         .WithMany()
-                        .HasForeignKey("CoursesId")
+                        .HasForeignKey("CourseListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("VDiary.Models.User", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("UsersListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
