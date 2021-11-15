@@ -31,7 +31,16 @@ namespace VDiary.Models
         [Range(1, Int32.MaxValue)]
         public string Signature { get; set; }
         public DateTime DateResetRequest { get; set; }
-        
+
+        [Display(Name = "Full Name")]
+        public string FullName
+        {
+            get
+            {
+                return FirstName + " " + Surname;
+            }
+        }
+
         [Display(Name = "Role")]
         public int RoleId { get; set; }
         public virtual Role Role { get; set; }

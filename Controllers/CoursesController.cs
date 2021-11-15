@@ -80,9 +80,35 @@ namespace VDiary.Controllers
             ViewBag.CourseId = id;
 
             //var users = _context.User.Where(u => u.RoleId == 3).ToList();
-            ViewData["Users"] = new SelectList(_context.User.Where(u => u.RoleId == 3), "Id", "Id");
+            ViewData["Users"] = new SelectList(_context.User.Where(u => u.RoleId == 3), "Id", "FirstName");
+            ViewData["Lecturers"] = new SelectList(_context.User.Where(u => u.RoleId == 2), "Id", "FirstName");
 
             return View();
+        }
+
+        //POST: Courses/AddStudent
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddStudent([Bind("UserId,CourseId")]CourseUser cu,[FromRoute]int id)
+        {
+            var ides = cu;
+
+            cu.CourseId = id;
+            if (ModelState.IsValid)
+            {
+                _context.Add(cu);
+                _context.SaveChanges();
+                return RedirectToAction(ShowMembers(cu.CourseId));
+            }
+
+            return View();
+
+
+        }
+
+        private IActionResult RedirectToAction(Task<IActionResult> task)
+        {
+            throw new NotImplementedException();
         }
 
         // GET: Courses/Create

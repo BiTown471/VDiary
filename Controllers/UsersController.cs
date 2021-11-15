@@ -23,6 +23,7 @@ namespace VDiary.Controllers
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.User.Include(u => u.Role);
+
             return View(await applicationDbContext.ToListAsync());
         }
 
