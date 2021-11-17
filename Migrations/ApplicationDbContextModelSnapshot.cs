@@ -19,21 +19,6 @@ namespace VDiary.Migrations
                 .HasAnnotation("ProductVersion", "5.0.12")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("CourseUser", b =>
-                {
-                    b.Property<int>("CourseListId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersListId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CourseListId", "UsersListId");
-
-                    b.HasIndex("UsersListId");
-
-                    b.ToTable("CourseUser");
-                });
-
             modelBuilder.Entity("VDiary.Models.Course", b =>
                 {
                     b.Property<int>("Id")
@@ -56,6 +41,9 @@ namespace VDiary.Migrations
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Venue")
                         .HasMaxLength(8)
                         .HasColumnType("nvarchar(8)");
@@ -63,6 +51,8 @@ namespace VDiary.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SubjectID");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Course");
                 });
@@ -157,21 +147,6 @@ namespace VDiary.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("CourseUser", b =>
-                {
-                    b.HasOne("VDiary.Models.Course", null)
-                        .WithMany()
-                        .HasForeignKey("CourseListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VDiary.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("VDiary.Models.Course", b =>
                 {
                     b.HasOne("VDiary.Models.Subject", "Subject")
@@ -180,7 +155,13 @@ namespace VDiary.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("VDiary.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Subject");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("VDiary.Models.User", b =>

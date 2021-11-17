@@ -2,28 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VDiary.Data;
 using VDiary.Models;
+using VDiary.Models.Dtos;
 
 namespace VDiary.Controllers
 {
     public class CoursesController : Controller
     {
+        private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
 
-        public CoursesController(ApplicationDbContext context)
+        public CoursesController(ApplicationDbContext context,IMapper mapper)
         {
+            _mapper = mapper;
             _context = context;
         }
 
         // GET: Courses
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Course.Include(c => c.Subject);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = _context.Course
+                .Include(c => c.Subject)
+                .Include(l => l.Lecturer)
+                .ToList();
+            var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
+
+
+            return View(courses);
         }
 
         // GET: Courses/Details/5
@@ -46,29 +56,27 @@ namespace VDiary.Controllers
         }
 
         // GET: Courses/ShowMembers/5
-        public async Task<IActionResult> ShowMembers(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> ShowMembers(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var course = await _context.Course
-                .Include(c => c.UsersList)
-                .Include(c => c.Subject)
-                .FirstOrDefaultAsync(c => c.Id == id);
+        //    var course = await _context.Course
+        //        .FirstOrDefaultAsync(c => c.Id == id);
 
-            var students = course.UsersList.ToList();
+        //    var students = course;
 
-            if (students == null)
-            {
-                return NotFound();
-            }
+        //    if (students == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            ViewBag.CourseId = id;
+        //    ViewBag.CourseId = id;
 
-            return View(students);
-        }
+        //    return View(students);
+        //}
 
         //GET: Courses/AddStudent
         public IActionResult AddStudent(int? id)
@@ -87,24 +95,24 @@ namespace VDiary.Controllers
         }
 
         //POST: Courses/AddStudent
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult AddStudent([Bind("UserId,CourseId")]CourseUser cu,[FromRoute]int id)
-        {
-            var ides = cu;
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult AddStudent([Bind("UserId,CourseId")]CourseUser cu,[FromRoute]int id)
+        //{
+        //    var ides = cu;
 
-            cu.CourseId = id;
-            if (ModelState.IsValid)
-            {
-                _context.Add(cu);
-                _context.SaveChanges();
-                return RedirectToAction(ShowMembers(cu.CourseId));
-            }
+        //    cu.CourseId = id;
+        //    if (ModelState.IsValid)
+        //    {
+        //        _context.Add(cu);
+        //        _context.SaveChanges();
+        //        return RedirectToAction(ShowMembers(cu.CourseId));
+        //    }
 
-            return View();
+        //    return View();
 
 
-        }
+        //}
 
         private IActionResult RedirectToAction(Task<IActionResult> task)
         {
@@ -114,7 +122,8 @@ namespace VDiary.Controllers
         // GET: Courses/Create
         public IActionResult Create()
         {
-            ViewData["SubjectID"] = new SelectList(_context.Subject, "Id", "Name");
+            ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name");
+            ViewData["LecturerId"] = new SelectList(_context.User.Where(u => u.RoleId == 2), "Id", "FullName");
             return View();
         }
 
@@ -131,7 +140,8 @@ namespace VDiary.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SubjectID"] = new SelectList(_context.Subject, "Id", "Id", course.SubjectID);
+            ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name");
+            ViewData["LecturerId"] = new SelectList(_context.User.Where(u => u.RoleId == 2), "Id", "FullName");
             return View(course);
         }
 
@@ -148,7 +158,8 @@ namespace VDiary.Controllers
             {
                 return NotFound();
             }
-            ViewData["SubjectID"] = new SelectList(_context.Subject, "Id", "Id", course.SubjectID);
+            ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name",course.SubjectID);
+            ViewData["LecturerId"] = new SelectList(_context.User.Where(u => u.RoleId == 2), "Id", "FullName",course.LecturerID);
             return View(course);
         }
 

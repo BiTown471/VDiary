@@ -1,4 +1,4 @@
-﻿@model IEnumerable<VDiary.Models.Course>
+﻿@model IEnumerable<VDiary.Models.Dtos.CourseDto>
 
 @{
     ViewData["Title"] = "Index";
@@ -16,7 +16,7 @@
                 @Html.DisplayNameFor(model => model.Subject)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LecturerID)
+                @Html.DisplayNameFor(model => model.Lecturer)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Time)
@@ -37,10 +37,10 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Subject.Name)
+                @Html.DisplayFor(modelItem => item.Subject)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.LecturerID)
+                @Html.DisplayFor(modelItem => item.Lecturer)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Time)
@@ -58,7 +58,7 @@
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> | 
-                <a asp-action="ShowMembers" asp-route-id="@item.Id">Show members</a>
+                @*<a asp-action="ShowMembers" asp-route-id="@item.Id">Show members</a>*@
             </td>
         </tr>
 }

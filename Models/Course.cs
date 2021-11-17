@@ -16,7 +16,7 @@ namespace VDiary.Models
         public int SubjectID { get; set; } //Name of course
         public virtual Subject Subject { get; set; }
         public int LecturerID { get; set; }
-
+        public virtual User Lecturer { get; set; }
         public DateTime Time { get; set; }
 
         [MaxLength(8)]
@@ -25,7 +25,5 @@ namespace VDiary.Models
         public bool Active { get; set; }
 
         
-        
-        public virtual ICollection<User> UsersList { get; set; }
     }
 }

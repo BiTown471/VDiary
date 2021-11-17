@@ -36,10 +36,10 @@ namespace VDiary.Data
                .WithMany(c => c.CourseList)
                .HasForeignKey(cu => cu.UserId);*/
 
-           modelBuilder.Entity<Course>()
-               .HasMany(c => c.UsersList)
-               .WithMany(c => c.CourseList)
-               .UsingEntity(j => j.ToTable("CourseUser"));
+           //modelBuilder.Entity<Course>()
+           //    .HasMany(c => c.UsersList)
+           //    .WithMany(c => c.CourseList)
+           //    .UsingEntity(j => j.ToTable("CourseUser"));
        }
     }
 }
