@@ -13,17 +13,17 @@ namespace VDiary.Models
         public int Id { get; set; }
 
         [DisplayName("Name of course")]
-        public int SubjectID { get; set; } //Name of course
+        public int SubjectId { get; set; } //Name of course
         public virtual Subject Subject { get; set; }
-        public int LecturerID { get; set; }
-        public virtual User Lecturer { get; set; }
+        public int LecturerId { get; set; }
         public DateTime Time { get; set; }
 
-        [MaxLength(8)]
+        [MaxLength(10)]
         public string Venue { get; set; } // place
         public string GroupName { get; set; }
         public bool Active { get; set; }
 
-        
+        public ICollection<User> Users{ get; set; }
+        public List<CourseUser> CourseUsers{ get; set; }
     }
 }

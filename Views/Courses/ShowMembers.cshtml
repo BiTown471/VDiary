@@ -2,22 +2,21 @@
 
 @{
     ViewData["Title"] = "ShowMembers";
+    
 }
 
 <h1>ShowMembers</h1>
 
 <p>
-    <a asp-action="AddStudent" asp-route-id ="@ViewBag.CourseId">Add Student</a>
+    <a asp-action="AddStudent" asp-route-id ="@ViewData["CourseId"]">Add Student</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Surname)
+                @Html.DisplayNameFor(model => model.FullName)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
+            
             <th>
                 @Html.DisplayNameFor(model => model.IsDeleted)
             </th>
@@ -25,23 +24,24 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Surname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            
-            <td>
-                @Html.DisplayFor(modelItem => item.IsDeleted)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@foreach (var item in Model)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.FullName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsDeleted)
+        </td>
+        <td>
+            <form asp-action="DeleteStudentFromCourse" asp-route-Id="@item.Id">
+                <input type="hidden" asp-for="@item.Id"/>
+                <input type="submit" value="Delete" class="btn btn-danger"/> 
+
+            </form>
+        </td>
+    </tr>
 }
     </tbody>
 </table>
+<a asp-action="Index">Back to List</a>

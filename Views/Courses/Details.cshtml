@@ -17,10 +17,10 @@
             @Html.DisplayFor(model => model.Subject.Id)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LecturerID)
+            @Html.DisplayNameFor(model => model.LecturerId)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LecturerID)
+            @Html.DisplayFor(model => model.LecturerId)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Time)
@@ -50,5 +50,6 @@
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to List</a>|
+    <a asp-action="CreateNewDate" asp-route-id="@Model.Id">Add new date</a>
 </div>

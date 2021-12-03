@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 using VDiary.Models;
 
@@ -14,7 +15,7 @@ namespace VDiary.Data
         public DbSet<VDiary.Models.Subject> Subject { get; set; }
         public DbSet<VDiary.Models.User> User { get; set; }
         public DbSet<VDiary.Models.Course> Course { get; set; }
-        //public DbSet<VDiary.Models.CourseUser> CourseUser { get; set; }
+        public DbSet<VDiary.Models.CourseUser> CourseUser { get; set; }
 
         // public DbSet<Role> Role { get; set; }
        // public DbSet<User> User { get; set; }
@@ -23,23 +24,49 @@ namespace VDiary.Data
 
        protected override void OnModelCreating(ModelBuilder modelBuilder)
        {
-           /*modelBuilder.Entity<CourseUser>()
-               .HasKey(cu => new {cu.CourseId, cu.UserId});
 
-           modelBuilder.Entity<CourseUser>()
-               .HasOne(cu => cu.Course)
-               .WithMany(c => c.UsersList)
-               .HasForeignKey(cu => cu.CourseId);
 
-           modelBuilder.Entity<CourseUser>()
-               .HasOne(cu => cu.User)
-               .WithMany(c => c.CourseList)
-               .HasForeignKey(cu => cu.UserId);*/
+            //modelBuilder.Entity<Course>()
+            //    .HasMany(c => c.Users)
+            //    .WithMany(c => c.Courses)
+            //    .UsingEntity(j => j.ToTable("CourseUser"));
 
-           //modelBuilder.Entity<Course>()
-           //    .HasMany(c => c.UsersList)
-           //    .WithMany(c => c.CourseList)
-           //    .UsingEntity(j => j.ToTable("CourseUser"));
-       }
+            //modelBuilder.Entity<Course>()
+            //    .HasMany(c => c.Users)
+            //    .WithMany(c => c.Courses)
+            //    .UsingEntity<Dictionary<string, object>>(
+            //        "CourseUser", 
+            //        j => j
+            //            .HasOne<User>()
+            //            .WithMany()
+            //            .HasForeignKey("UserId")
+            //            .HasConstraintName("FK_CourseUser_Users_UserId")
+            //            .OnDelete(DeleteBehavior.Cascade),
+            //        j => j
+            //            .HasOne<Course>()
+            //            .WithMany()
+            //            .HasForeignKey("CourseId")
+            //            .HasConstraintName("FK_CourseUser_Courses_CourseId")
+            //            .OnDelete(DeleteBehavior.ClientCascade))
+            //        ;
+
+            modelBuilder.Entity<Course>()
+                .HasMany(c => c.Users)
+                .WithMany(c => c.Courses)
+                .UsingEntity<CourseUser>(
+                    j => j
+                        .HasOne(cu => cu.User)
+                        .WithMany(t => t.CourseUsers)
+                        .HasForeignKey(cu => cu.UserId),
+                    j => j
+                        .HasOne(cu => cu.Course)
+                        .WithMany(p => p.CourseUsers)
+                        .HasForeignKey(cu => cu.CourseId),
+                    j =>
+                    {
+                        j.HasKey(t => new { t.Id});
+                    }
+                    );
+        }
     }
 }

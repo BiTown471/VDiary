@@ -16,7 +16,7 @@
                 @Html.DisplayNameFor(model => model.Subject)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Lecturer)
+                @Html.DisplayNameFor(model => model.LecturerName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Time)
@@ -40,7 +40,7 @@
                 @Html.DisplayFor(modelItem => item.Subject)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Lecturer)
+                @Html.DisplayFor(modelItem => item.LecturerName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Time)
@@ -58,7 +58,7 @@
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> | 
-                @*<a asp-action="ShowMembers" asp-route-id="@item.Id">Show members</a>*@
+                <a asp-action="ShowMembers" asp-route-id="@item.Id">Show members</a>
             </td>
         </tr>
 }

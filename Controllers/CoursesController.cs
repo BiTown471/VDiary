@@ -28,7 +28,7 @@ namespace VDiary.Controllers
         {
             var applicationDbContext = _context.Course
                 .Include(c => c.Subject)
-                .Include(l => l.Lecturer)
+                .Include(c => c.Users)
                 .ToList();
             var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
 
@@ -55,64 +55,9 @@ namespace VDiary.Controllers
             return View(course);
         }
 
-        // GET: Courses/ShowMembers/5
-        //public async Task<IActionResult> ShowMembers(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var course = await _context.Course
-        //        .FirstOrDefaultAsync(c => c.Id == id);
-
-        //    var students = course;
-
-        //    if (students == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    ViewBag.CourseId = id;
-
-        //    return View(students);
-        //}
-
-        //GET: Courses/AddStudent
-        public IActionResult AddStudent(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            ViewBag.CourseId = id;
-
-            //var users = _context.User.Where(u => u.RoleId == 3).ToList();
-            ViewData["Users"] = new SelectList(_context.User.Where(u => u.RoleId == 3), "Id", "FirstName");
-            ViewData["Lecturers"] = new SelectList(_context.User.Where(u => u.RoleId == 2), "Id", "FirstName");
-
-            return View();
-        }
-
-        //POST: Courses/AddStudent
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult AddStudent([Bind("UserId,CourseId")]CourseUser cu,[FromRoute]int id)
-        //{
-        //    var ides = cu;
-
-        //    cu.CourseId = id;
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(cu);
-        //        _context.SaveChanges();
-        //        return RedirectToAction(ShowMembers(cu.CourseId));
-        //    }
-
-        //    return View();
-
-
-        //}
+        
+        
+        
 
         private IActionResult RedirectToAction(Task<IActionResult> task)
         {
@@ -132,12 +77,20 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SubjectID,LecturerID,Time,Venue,GroupName,Active")] Course course)
+        public async Task<IActionResult> Create([Bind("Id,SubjectId,LecturerId,Time,Venue,GroupName,Active")] Course course)
         {
+            var relation = new CourseUser();
+            relation.CourseId = course.Id;
+            relation.UserId = course.LecturerId;
+            relation.Course = course;
+            relation.User = _context.User.Find(course.LecturerId);
+
             if (ModelState.IsValid)
             {
                 _context.Add(course);
                 await _context.SaveChangesAsync();
+                _context.CourseUser.Add(relation);
+                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name");
@@ -145,6 +98,58 @@ namespace VDiary.Controllers
             return View(course);
         }
 
+        //GET :
+        public async Task<IActionResult> CreateNewDate(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var course = await _context.Course
+                .Include(c => c.Subject)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (course == null)
+            {
+                return NotFound();
+            }
+
+            return View(course);
+
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateNewDate(int id ,[Bind("Id,SubjectId,LecturerId,Time,Venue,GroupName,Active")] Course courseOld)
+        {
+            var newDate = courseOld.Time;
+            courseOld = _context.Course.FirstOrDefault(c => c.Id == courseOld.Id);
+            courseOld.Id = 0;
+            var course = new Course();
+            course = courseOld;
+            course.Time = newDate;
+
+            var realations = _context.CourseUser.Where(cu => cu.CourseId == id);
+            
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(course);
+                await _context.SaveChangesAsync();
+                var newId = _context.Course.OrderBy(c => c.Id).Last().Id;
+                foreach (var courseUser in realations)
+                {
+                    courseUser.CourseId = newId;
+                    courseUser.Id = 0;
+                    _context.CourseUser.Add(courseUser);
+                }
+                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name");
+            ViewData["LecturerId"] = new SelectList(_context.User.Where(u => u.RoleId == 2), "Id", "FullName");
+            return View(course);
+        }
         // GET: Courses/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -153,14 +158,22 @@ namespace VDiary.Controllers
                 return NotFound();
             }
 
-            var course = await _context.Course.FindAsync(id);
-            if (course == null)
+
+            var courseDbContext =  await  _context.Course
+                .Include(c => c.Subject)
+                .Include(c => c.Users)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+
+           // var course = _mapper.Map<CourseDto>(courseDbContext);
+
+            if (courseDbContext == null)
             {
                 return NotFound();
             }
-            ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name",course.SubjectID);
-            ViewData["LecturerId"] = new SelectList(_context.User.Where(u => u.RoleId == 2), "Id", "FullName",course.LecturerID);
-            return View(course);
+            //ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name",course.Subject);
+            ViewData["LecturerId"] = new SelectList(_context.User.Where(u => u.RoleId == 2), "Id", "FullName");
+            return View(courseDbContext);
         }
 
         // POST: Courses/Edit/5
@@ -168,19 +181,30 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,SubjectID,LecturerID,Time,Venue,GroupName,Active")] Course course)
+        public IActionResult Edit(int id, [Bind("Id,SubjectId,Subject,LecturerId,Time,Venue,GroupName,Active,Users,CourseUsers")] Course courseEdit)
         {
-            if (id != course.Id)
+            if (id != courseEdit.Id)
             {
                 return NotFound();
             }
+
+            var course = _context.Course.Find(id);
+
+            course.LecturerId = courseEdit.LecturerId;
+            course.Time = courseEdit.Time;
+            course.Venue = courseEdit.Venue;
+            course.Active = courseEdit.Active;
+
+            var relation = _context.CourseUser.First(cu => cu.CourseId == id);
+            relation.UserId = courseEdit.LecturerId;
+            relation.User = _context.User.Find(courseEdit.LecturerId);
 
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(course);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -195,7 +219,7 @@ namespace VDiary.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SubjectID"] = new SelectList(_context.Subject, "Id", "Id", course.SubjectID);
+            ViewData["SubjectID"] = new SelectList(_context.Subject, "Id", "Id", course.Subject);
             return View(course);
         }
 
@@ -233,5 +257,90 @@ namespace VDiary.Controllers
         {
             return _context.Course.Any(e => e.Id == id);
         }
+
+        // GET: Courses/ShowMembers/5
+        public async Task<IActionResult> ShowMembers(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var course = _context.CourseUser
+                .Include(cu => cu.User)
+                .Where(c => c.CourseId == id)
+                .Where(c => c.User.RoleId != 2)
+                .Select(u => u.User);
+
+            if (course == null)
+            {
+                return NotFound();
+            }
+
+            //var users = course.Users.ToList();
+            ViewData["CourseId"] = id;
+            return View(course);
+        }
+        //GET
+        public async Task<IActionResult> AddStudent(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var useres = _context.User
+                .Where(u => u.RoleId != 1 && u.RoleId != 2).ToList();
+            var mainCours = _context.Course.Find(id);
+            var useres2 = _context.User
+                .Include(u => u.Courses)
+                .Where(u => !u.Courses.Contains(mainCours))
+                .Where(u => u.RoleId != 1 && u.RoleId != 2);
+
+            ViewData["CourseId"] = id;
+            return View(useres2);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddStudent(int CourseId, int UserId)
+        {
+            var relation = new CourseUser();
+            relation.CourseId = CourseId;
+            relation.UserId = UserId;
+            relation.Course = _context.Course.Find(CourseId);
+            relation.User = _context.User.Find(UserId);
+
+            if (CourseId == null)
+            {
+                return NotFound();
+            }
+
+            if (UserId == null)
+            {
+                return NotFound();
+            }
+
+            _context.CourseUser.Add(relation);
+            _context.SaveChanges();
+
+            //var useres = _context.User
+            //   .Where(u => u.RoleId != 1 && u.RoleId != 2).ToList();
+
+            return RedirectToAction("ShowMembers", new {id = CourseId});
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteStudentFromCourse(int id)
+        {
+            var course =_context.CourseUser
+                .Where(cu => cu.UserId == id)
+                .FirstOrDefault();
+            _context.CourseUser.Remove(course);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ShowMembers", new { id = course.CourseId});
+        }
+
+       
+
     }    
 }

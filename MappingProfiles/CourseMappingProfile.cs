@@ -13,9 +13,12 @@ namespace VDiary.MappingProfiles
         public CourseMappingProfile()
         {
             CreateMap<Course, CourseDto>()
-                .ForMember(c => c.Lecturer, u => u.MapFrom(c => c.Lecturer.FullName))
-                .ForMember(c => c.Subject, u => u.MapFrom(c => c.Subject.Name));
+                .ForMember(c => c.Subject, u => u.MapFrom(c => c.Subject.Name))
+                .ForMember(c => c.LecturerName, u => u.MapFrom(c => c.Users.FirstOrDefault(u => u.Id==c.LecturerId).FullName))
+                .ForMember(c => c.GroupName, u => u.MapFrom(c => c.GroupName));
 
+
+            CreateMap<CourseDto, Course>();
 
         }
     }
