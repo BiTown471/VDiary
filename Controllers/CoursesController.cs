@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using VDiary.Models.Dtos;
 
 namespace VDiary.Controllers
 {
+    [Authorize]
     public class CoursesController : Controller
     {
         private readonly IMapper _mapper;
@@ -24,19 +26,43 @@ namespace VDiary.Controllers
         }
 
         // GET: Courses
-        public async Task<IActionResult> Index()
+        public IActionResult Index(int? id)
         {
-            var applicationDbContext = _context.Course
-                .Include(c => c.Subject)
-                .Include(c => c.Users)
-                .ToList();
-            var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
+            var user = _context.User
+                .Include(u => u.Role)
+                .FirstOrDefault(u => u.Id == id);
+            if (user is null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            if (user.Role.Name == "Admin")
+            {
+                var applicationDbContext = _context.Course
+                    .Include(c => c.Subject)
+                    .Include(c => c.Users)
+                    .ToList();
+                var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
 
 
-            return View(courses);
+                return View(courses);
+            }
+            else
+            {
+                var applicationDbContext = _context.Course
+                    .Include(c => c.Subject)
+                    .Include(c => c.Users)
+                    .Where(c => c.Users.Any(u => u.Id == id))
+                    .ToList();
+                var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
+
+                return View(courses);
+            }
+
+            return NotFound();
         }
 
         // GET: Courses/Details/5
+        [Authorize(Roles = "Lecturer,Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -55,16 +81,13 @@ namespace VDiary.Controllers
             return View(course);
         }
 
-        
-        
-        
-
         private IActionResult RedirectToAction(Task<IActionResult> task)
         {
             throw new NotImplementedException();
         }
 
         // GET: Courses/Create
+        [Authorize(Roles = "Lecturer,Admin")]
         public IActionResult Create()
         {
             ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name");
@@ -77,6 +100,7 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Lecturer,Admin")]
         public async Task<IActionResult> Create([Bind("Id,SubjectId,LecturerId,Time,Venue,GroupName,Active")] Course course)
         {
             var relation = new CourseUser();
@@ -91,7 +115,7 @@ namespace VDiary.Controllers
                 await _context.SaveChangesAsync();
                 _context.CourseUser.Add(relation);
                 _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index),new {id = course.LecturerId});
             }
             ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name");
             ViewData["LecturerId"] = new SelectList(_context.User.Where(u => u.RoleId == 2), "Id", "FullName");
@@ -99,6 +123,7 @@ namespace VDiary.Controllers
         }
 
         //GET :
+        [Authorize(Roles = "Lecturer,Admin")]
         public async Task<IActionResult> CreateNewDate(int? id)
         {
             if (id == null)
@@ -120,6 +145,7 @@ namespace VDiary.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Lecturer,Admin")]
         public async Task<IActionResult> CreateNewDate(int id ,[Bind("Id,SubjectId,LecturerId,Time,Venue,GroupName,Active")] Course courseOld)
         {
             var newDate = courseOld.Time;
@@ -151,6 +177,7 @@ namespace VDiary.Controllers
             return View(course);
         }
         // GET: Courses/Edit/5
+        [Authorize(Roles = "Lecturer,Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -181,6 +208,7 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Lecturer,Admin")]
         public IActionResult Edit(int id, [Bind("Id,SubjectId,Subject,LecturerId,Time,Venue,GroupName,Active,Users,CourseUsers")] Course courseEdit)
         {
             if (id != courseEdit.Id)
@@ -224,6 +252,7 @@ namespace VDiary.Controllers
         }
 
         // GET: Courses/Delete/5
+        [Authorize(Roles = "Lecturer,Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -245,12 +274,13 @@ namespace VDiary.Controllers
         // POST: Courses/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Lecturer,Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var course = await _context.Course.FindAsync(id);
             _context.Course.Remove(course);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index),new{id = course.LecturerId});
         }
 
         private bool CourseExists(int id)
@@ -276,12 +306,11 @@ namespace VDiary.Controllers
             {
                 return NotFound();
             }
-
-            //var users = course.Users.ToList();
             ViewData["CourseId"] = id;
             return View(course);
         }
         //GET
+        [Authorize(Roles = "Lecturer")]
         public async Task<IActionResult> AddStudent(int? id)
         {
             if (id == null)
@@ -302,6 +331,7 @@ namespace VDiary.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Lecturer")]
         public async Task<IActionResult> AddStudent(int CourseId, int UserId)
         {
             var relation = new CourseUser();
@@ -330,6 +360,7 @@ namespace VDiary.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Lecturer")]
         public async Task<IActionResult> DeleteStudentFromCourse(int id)
         {
             var course =_context.CourseUser

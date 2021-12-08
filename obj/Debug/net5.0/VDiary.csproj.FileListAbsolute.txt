@@ -169,3 +169,5 @@ C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Courses\AddStudent.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\VDiary.csproj.AssemblyReference.cache
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Courses\CreateNewDate.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Home\Denied.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
