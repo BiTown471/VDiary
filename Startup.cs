@@ -36,11 +36,13 @@ namespace VDiary
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("VDiary")));
             services.AddAutoMapper(this.GetType().Assembly);
+            services.AddScoped<Seed>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,Seed seeder)
         {
+            seeder.SeederAll();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
