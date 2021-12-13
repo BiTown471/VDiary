@@ -3,8 +3,19 @@
 
 @{
     ViewData["Title"] = "Edit";
+    ViewData["filter"] = "";
 }
-
+<form asp-action="AddStudent" method="get" asp-route-id="@ViewData["CourseId"]">
+    
+    <p>
+        Find by name: <input type="text" name="filter" value="@ViewData["filter"]" />
+        <input type="submit" value="Search" class="btn btn-primary" /> |
+        <a asp-action="AddStudent" asp-route-id="@ViewData["CourseId"]">Back to Full List</a>
+    </p>
+    @*<div class="form-group">
+        <input type="submit" value="Search" class="btn btn-primary" />
+    </div>*@
+</form>
 <table class="table">
     <thead>
         <tr>

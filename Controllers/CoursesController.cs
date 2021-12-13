@@ -40,6 +40,7 @@ namespace VDiary.Controllers
                     .Include(c => c.Subject)
                     .Include(c => c.CourseUsers)
                     .ThenInclude(cu => cu.User)
+                    .OrderBy(c => c.Time)
                     .ToListAsync();
                 var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
 
@@ -52,9 +53,10 @@ namespace VDiary.Controllers
                     .Include(c => c.Subject)
                     .Include(c => c.CourseUsers)
                     .ThenInclude(cu => cu.User)
-                    .Where(c => c.CourseUsers.FirstOrDefault(cu => cu.UserId == id).UserId == userId).ToList();
-                    ;
-                
+                    .Where(c => c.CourseUsers.FirstOrDefault(cu => cu.UserId == id).UserId == userId)
+                    .OrderBy(c => c.Time)
+                    .ToList();
+                                    
                 var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
 
                 return View(courses);
@@ -337,20 +339,23 @@ namespace VDiary.Controllers
         
         //GET Courses/AddStudent/5 
         [Authorize(Roles = "Lecturer")]
-        public async Task<IActionResult> AddStudent(int? id)  /// it is  course id 
+        public async Task<IActionResult> AddStudent(int? id, string? filter)  /// it is  course id 
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var useres =  _context.User
+            var useres =  await _context.User
                 .Include(u =>u.CourseUsers)
                 .ThenInclude(cu => cu.Course)
                 .Where(u => u.RoleId != 1 && u.RoleId != 2)
                 .Where(u => u.CourseUsers.All(cu => cu.CourseId != id))
-                .ToList();
-
+                .ToListAsync();
+            if (filter is not null)
+            {
+                useres =useres.Where(u => u.FullName.Contains(filter)).ToList();
+            }
 
             ViewData["CourseId"] = id;
             return View(useres);
