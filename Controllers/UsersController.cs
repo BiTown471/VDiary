@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VDiary.Data;
 using VDiary.Models;
 
+
 namespace VDiary.Controllers
 {
+    [Authorize]
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,6 +24,7 @@ namespace VDiary.Controllers
         }
 
         // GET: Users
+        [Authorize(Roles= "Admin,Lecturer")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.User.Include(u => u.Role);
@@ -28,6 +33,7 @@ namespace VDiary.Controllers
         }
 
         // GET: Users/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,8 +41,15 @@ namespace VDiary.Controllers
                 return NotFound();
             }
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            if (userRole != "Admin" && userId != id.ToString())
+            {
+                return RedirectToAction("Denied", "Home");
+            }
             var user = await _context.User
                 .Include(u => u.Role)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
             {
@@ -47,6 +60,7 @@ namespace VDiary.Controllers
         }
 
         // GET: Users/Create
+        [Authorize(Roles = "Admin,Lecturer")]
         public IActionResult Create()
         {
             IEnumerable<Role> items = _context.Role;
@@ -65,7 +79,8 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Surname,FirstName,Password,Email,AlbumNumber,LastLoggedIn,DateCreated,AccountExpiryDays,MaxLoginAttemps,FilledLoginAtemps,IsDeleted,Signature,DateResetRequest,RoleId")] User user)
+        [Authorize(Roles = "Admin,Lecturer")]
+        public async Task<IActionResult> Create([Bind("Surname,FirstName,Email,AlbumNumber,Signature,RoleId")] User user)
         {
             user.LastLoggedIn = DateTime.Now;
             user.DateCreated = DateTime.Now;
@@ -94,7 +109,12 @@ namespace VDiary.Controllers
             {
                 return NotFound();
             }
-
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            if (userRole != "Admin" && userId != id.ToString())
+            {
+                return RedirectToAction("Denied", "Home");
+            }
             var user = await _context.User.FindAsync(id);
             if (user == null)
             {
@@ -107,40 +127,55 @@ namespace VDiary.Controllers
         // POST: Users/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Surname,FirstName,Password,Email,AlbumNumber,LastLoggedIn,DateCreated,AccountExpiryDays,MaxLoginAttemps,FilledLoginAtemps,IsDeleted,Signature,DateResetRequest,RoleId")] User user)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != user.Id)
+            if (id is null)
             {
                 return NotFound();
             }
 
+            var userToUpdate = await _context.User.FirstOrDefaultAsync(u => u.Id == id);
             if (ModelState.IsValid)
             {
-                try
+                if (await TryUpdateModelAsync<User>(
+                    userToUpdate,
+                    "",
+                    u => u.FirstName,
+                    u => u.Surname,
+                    u => u.Password,
+                    u => u.Email,
+                    u => u.IsDeleted,
+                    u => u.Signature,
+                    u => u.Role
+                ))
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
+                    try
                     {
-                        return NotFound();
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!UserExists(userToUpdate.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                
+                return RedirectToAction("Details",new {id = userToUpdate.Id});
             }
-            ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id", user.RoleId);
-            return View(user);
+            ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id", userToUpdate.RoleId);
+            return View(userToUpdate);
         }
 
         // GET: Users/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -149,7 +184,7 @@ namespace VDiary.Controllers
             }
 
             var user = await _context.User
-                .Include(u => u.Role)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (user == null)
             {
@@ -162,9 +197,16 @@ namespace VDiary.Controllers
         // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+
             var user = await _context.User.FindAsync(id);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
             _context.User.Remove(user);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

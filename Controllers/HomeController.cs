@@ -32,7 +32,6 @@ namespace VDiary.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        //[Authorize]
         public IActionResult Privacy()
         {
             return View();
@@ -47,16 +46,14 @@ namespace VDiary.Controllers
         public IActionResult LoginUser(string returnUrl)
         {
 
-            ViewData["ReturnUrl"] = returnUrl;
-
             return View("Index");
         }
 
-        [HttpPost("/LoginUser")]
-        public async Task<IActionResult> LoginUser([Bind("Email","Password")]User LoginUser,string ReturnUrl)
+        [HttpPost("/LoginUser"),ActionName("LoginUser")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoginUserPost([Bind("Email","Password")]User LoginUser)
         {
-
-            //ViewData["ReturnUrl"] = ReturnUrl;
+            
             var user = _context.User
                 .Include(u => u.Role)
                 .FirstOrDefault(u => u.Email == LoginUser.Email);
@@ -66,7 +63,8 @@ namespace VDiary.Controllers
 
                 return View("Index");
             }
-
+            user.LastLoggedIn =DateTime.Now;
+            user.AccountExpiryDays = (user.LastLoggedIn - user.DateCreated).Days + 1;
             if (user.Password == LoginUser.Password)
             {
                 var claims = new List<Claim>();
@@ -77,12 +75,13 @@ namespace VDiary.Controllers
                 var claimsId = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsId);
                 await HttpContext.SignInAsync(claimsPrincipal);
+                user.FilledLoginAtemps = 0;
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Courses",new { id = user.Id});
             }
-
-            //_context.User.FindFirst();
-
-
+            user.DateFilledLoginAtemps = DateTime.Now;
+            user.FilledLoginAtemps += 1;
+            await _context.SaveChangesAsync();
             TempData["Error"] = "Email or Password is invalid";
 
             return View("Index");
@@ -91,7 +90,7 @@ namespace VDiary.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
-            return View("Index");
+            return RedirectToAction("Index","Home");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

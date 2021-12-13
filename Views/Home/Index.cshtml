@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Home Page";
-    var returnUrl = ViewData["ReturnUrl"] as string;
     var error = TempData["Error"] as string;
 }
 
@@ -13,8 +12,11 @@
         <h1 class="alert-danger">@error</h1>
     }
     <div class="col-md-4 align-content-center">
-        
-        <form asp-action="LoginUser" asp-route-ReturnUrl="@System.Net.WebUtility.UrlEncode(returnUrl)">
+    @if (User.Identity.IsAuthenticated)
+    {
+        @Html.ActionLink("","Index","Courses")
+    }
+        <form asp-action="LoginUser" >
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>

@@ -35,6 +35,7 @@ namespace VDiary
                 });
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("VDiary")));
+
             services.AddAutoMapper(this.GetType().Assembly);
             services.AddScoped<Seed>();
         }

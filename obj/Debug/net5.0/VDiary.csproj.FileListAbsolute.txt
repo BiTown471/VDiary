@@ -150,7 +150,6 @@ C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Roles\Index.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Subjects\Create.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Subjects\Delete.cshtml.g.cs
-C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Subjects\Details.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Subjects\Edit.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Subjects\Index.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Users\Create.cshtml.g.cs

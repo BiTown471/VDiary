@@ -115,9 +115,14 @@ namespace VDiary.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AlbumNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateFilledLoginAtemps")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateResetRequest")
@@ -145,7 +150,8 @@ namespace VDiary.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");

@@ -24,49 +24,24 @@ namespace VDiary.Data
 
        protected override void OnModelCreating(ModelBuilder modelBuilder)
        {
-
-
+            
             //modelBuilder.Entity<Course>()
             //    .HasMany(c => c.Users)
             //    .WithMany(c => c.Courses)
-            //    .UsingEntity(j => j.ToTable("CourseUser"));
-
-            //modelBuilder.Entity<Course>()
-            //    .HasMany(c => c.Users)
-            //    .WithMany(c => c.Courses)
-            //    .UsingEntity<Dictionary<string, object>>(
-            //        "CourseUser", 
+            //    .UsingEntity<CourseUser>(
             //        j => j
-            //            .HasOne<User>()
-            //            .WithMany()
-            //            .HasForeignKey("UserId")
-            //            .HasConstraintName("FK_CourseUser_Users_UserId")
-            //            .OnDelete(DeleteBehavior.Cascade),
+            //            .HasOne(cu => cu.User)
+            //            .WithMany(t => t.CourseUsers)
+            //            .HasForeignKey(cu => cu.UserId),
             //        j => j
-            //            .HasOne<Course>()
-            //            .WithMany()
-            //            .HasForeignKey("CourseId")
-            //            .HasConstraintName("FK_CourseUser_Courses_CourseId")
-            //            .OnDelete(DeleteBehavior.ClientCascade))
-            //        ;
-
-            modelBuilder.Entity<Course>()
-                .HasMany(c => c.Users)
-                .WithMany(c => c.Courses)
-                .UsingEntity<CourseUser>(
-                    j => j
-                        .HasOne(cu => cu.User)
-                        .WithMany(t => t.CourseUsers)
-                        .HasForeignKey(cu => cu.UserId),
-                    j => j
-                        .HasOne(cu => cu.Course)
-                        .WithMany(p => p.CourseUsers)
-                        .HasForeignKey(cu => cu.CourseId),
-                    j =>
-                    {
-                        j.HasKey(t => new { t.Id});
-                    }
-                    );
+            //            .HasOne(cu => cu.Course)
+            //            .WithMany(p => p.CourseUsers)
+            //            .HasForeignKey(cu => cu.CourseId),
+            //        j =>
+            //        {
+            //            j.HasKey(t => new { t.Id});
+            //        }
+            //        );
         }
     }
 }

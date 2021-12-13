@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using VDiary.Models;
 
 namespace VDiary.Controllers
 {
+    [Authorize(Roles = "Admin,Lecturer")]
     public class SubjectsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,23 +27,6 @@ namespace VDiary.Controllers
             return View(await _context.Subject.ToListAsync());
         }
 
-        // GET: Subjects/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var subject = await _context.Subject
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (subject == null)
-            {
-                return NotFound();
-            }
-
-            return View(subject);
-        }
 
         // GET: Subjects/Create
         public IActionResult Create()
@@ -54,7 +39,7 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Subject subject)
+        public async Task<IActionResult> Create([Bind("Name")] Subject subject)
         {
             if (ModelState.IsValid)
             {
@@ -84,36 +69,45 @@ namespace VDiary.Controllers
         // POST: Subjects/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Subject subject)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != subject.Id)
+            if (id is null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var subjectToUpdate = await _context.Subject.FirstOrDefaultAsync(s => s.Id == id);
+            if (await TryUpdateModelAsync<Subject>(
+                subjectToUpdate,
+                "",
+                s => s.Name
+            ))
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(subject);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SubjectExists(subject.Id))
+                    try
                     {
-                        return NotFound();
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!SubjectExists(subjectToUpdate.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(subject);
+
+            return View(subjectToUpdate);
         }
 
         // GET: Subjects/Delete/5
