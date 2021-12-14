@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = "ShowMembers";
-    var userId="";
+    var userId = "";
     @if (User.Identity.IsAuthenticated)
     {
         userId = @User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -14,7 +14,7 @@
 
 <h1>ShowMembers</h1>
 <p>
-    <a asp-action="AddStudent" asp-route-id ="@ViewData["CourseId"]">Add Student</a>
+    <a asp-action="AddStudent" asp-route-id="@ViewData["CourseId"]">Add Student</a>
 </p>
 <table class="table">
     <thead>
@@ -29,24 +29,24 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model)
-{
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.FullName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IsDeleted)
-        </td>
-        <td>
-            <form asp-action="DeleteStudentFromCourse" asp-route-Id="@item.Id">
-                <input type="hidden" asp-for="@item.Id"/>
-                <input type="submit" value="Delete" class="btn btn-danger"/> 
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsDeleted)
+                </td>
+                <td>
+                    <form asp-action="DeleteStudentFromCourse" asp-route-Id="@item.Id">
+                        <input type="hidden" asp-for="@item.Id" />
+                        <input type="submit" value="Delete" class="btn btn-danger" />
 
-            </form>
-        </td>
-    </tr>
-}
+                    </form>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 <a asp-action="Index" asp-route-id="@userId">Back to List</a>

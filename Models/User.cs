@@ -53,5 +53,6 @@ namespace VDiary.Models
         //public ICollection<Course> Courses { get; set; }
         //public List<CourseUser> CourseUsers { get; set; }
         public ICollection<CourseUser> CourseUsers { get; set; }
+                      
     }
 }

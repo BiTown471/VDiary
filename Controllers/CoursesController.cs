@@ -28,41 +28,43 @@ namespace VDiary.Controllers
         }
 
         // GET: Courses
-        public async Task<IActionResult> Index(int? id)
+        public async Task<IActionResult> Index(int? id,int? pageNumber)
         {
             
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
+            int pageSize = 10;
 
-            if (userRole == "Admin")
+            if (pageNumber is null)
             {
-                var applicationDbContext = await _context.Course
-                    .Include(c => c.Subject)
-                    .Include(c => c.CourseUsers)
-                    .ThenInclude(cu => cu.User)
-                    .OrderBy(c => c.Time)
-                    .ToListAsync();
-                var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
-
-
-                return View(courses);
+                pageNumber = 1;
             }
-            else
+            var applicationDbContext = await _context.Course
+                .Include(c => c.Subject)
+                .Include(c => c.CourseUsers)
+                .ThenInclude(cu => cu.User)
+                .OrderBy(c => c.Time)
+                .ToListAsync();
+            if (userRole != "Admin")
             {
-                var applicationDbContext = _context.Course
-                    .Include(c => c.Subject)
-                    .Include(c => c.CourseUsers)
-                    .ThenInclude(cu => cu.User)
-                    .Where(c => c.CourseUsers.FirstOrDefault(cu => cu.UserId == id).UserId == userId)
-                    .OrderBy(c => c.Time)
-                    .ToList();
-                                    
-                var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
-
-                return View(courses);
+                try
+                {
+                    applicationDbContext = applicationDbContext.Where(c =>
+                        c.CourseUsers.FirstOrDefault(cu => cu.UserId == id).UserId == userId).ToList();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return RedirectToAction("Index", "Home");
+                }
             }
-
-            return NotFound();
+            var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
+            var pList = new PaginatedList<CourseDto>(courses, courses.Count, pageNumber ?? 1, pageSize);
+            ViewData["HasPeireviousPage"] = pList.HasPreviousPage;
+            ViewData["HasNextPage"] = pList.HasNextPage;
+            ViewData["PageIndex"] = pList.PageIndex;
+            return View(await PaginatedList<CourseDto>.Create(courses, pageNumber ?? 1, pageSize));
+            //return NotFound();
         }
 
         // GET: Courses/Details/5
