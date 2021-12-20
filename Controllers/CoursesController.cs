@@ -49,8 +49,13 @@ namespace VDiary.Controllers
             {
                 try
                 {
-                    applicationDbContext = applicationDbContext.Where(c =>
-                        c.CourseUsers.FirstOrDefault(cu => cu.UserId == id).UserId == userId).ToList();
+                    applicationDbContext = await _context.Course
+                        .Include(c => c.Subject)
+                        .Include(c => c.CourseUsers)
+                        .ThenInclude(cu => cu.User)
+                        .OrderBy(c => c.Time)
+                        .Where(c =>
+                        c.CourseUsers.FirstOrDefault(cu => cu.UserId == id).UserId == userId).ToListAsync(); ;
                 }
                 catch (Exception e)
                 {

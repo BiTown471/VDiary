@@ -28,6 +28,12 @@ namespace VDiary.Controllers
 
         public IActionResult Index()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is not null)
+            {
+                
+                return RedirectToAction("Index", "Courses", new { id = userId });
+            }
             return View();
         }
 

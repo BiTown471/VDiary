@@ -16,6 +16,7 @@ namespace VDiary.Data
         public DbSet<VDiary.Models.User> User { get; set; }
         public DbSet<VDiary.Models.Course> Course { get; set; }
         public DbSet<VDiary.Models.CourseUser> CourseUser { get; set; }
+        public DbSet<VDiary.Models.Grade> Grade { get; set; }
 
         // public DbSet<Role> Role { get; set; }
        // public DbSet<User> User { get; set; }
@@ -43,5 +44,12 @@ namespace VDiary.Data
             //        }
             //        );
         }
+
+        // public DbSet<Role> Role { get; set; }
+       // public DbSet<User> User { get; set; }
+       // public DbSet<Subject> Subjects{ get; set; }
+
+
+       public DbSet<VDiary.Models.Grade> Mark { get; set; }
     }
 }

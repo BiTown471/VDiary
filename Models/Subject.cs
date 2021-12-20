@@ -13,6 +13,6 @@ namespace VDiary.Models
         [Required]
         [MinLength(3)]
         public string Name { get; set; }
-        public ICollection<Mark> Marks { get; set; }
+        public ICollection<Grade> Marks { get; set; }
     }
 }

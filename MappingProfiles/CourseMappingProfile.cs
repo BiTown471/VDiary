@@ -20,7 +20,6 @@ namespace VDiary.MappingProfiles
 
 
             CreateMap<CourseDto, Course>();
-
         }
     }
 }

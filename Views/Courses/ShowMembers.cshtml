@@ -4,28 +4,36 @@
 @{
     ViewData["Title"] = "ShowMembers";
     var userId = "";
+    var userRole = "";
     @if (User.Identity.IsAuthenticated)
     {
         userId = @User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        userRole = @User.FindFirst(c => c.Type == ClaimTypes.Role).Value;
     }
 
 
 }
 
-<h1>ShowMembers</h1>
-<p>
-    <a asp-action="AddStudent" asp-route-id="@ViewData["CourseId"]">Add Student</a>
-</p>
+<h1>Course students</h1>
+@if (userRole != "Student")
+{
+    <p>
+        <a asp-action="AddStudent" asp-route-id="@ViewData["CourseId"]">Add Student</a>
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.FullName)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsDeleted)
-            </th>
-            <th></th>
+            @if(userRole != "Student")
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.IsDeleted)
+                </th>
+                <th></th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -35,16 +43,19 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.FullName)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IsDeleted)
-                </td>
-                <td>
-                    <form asp-action="DeleteStudentFromCourse" asp-route-Id="@item.Id">
-                        <input type="hidden" asp-for="@item.Id" />
-                        <input type="submit" value="Delete" class="btn btn-danger" />
+                @if(userRole != "Student")
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsDeleted)
+                    </td>
+                    <td>
+                        <form asp-action="DeleteStudentFromCourse" asp-route-Id="@item.Id">
+                            <input type="hidden" asp-for="@item.Id" />
+                            <input type="submit" value="Delete" class="btn btn-danger" />
 
-                    </form>
-                </td>
+                        </form>
+                    </td>
+                }
             </tr>
         }
     </tbody>

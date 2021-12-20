@@ -54,15 +54,21 @@
                             }
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Courses" asp-action="Index" asp-route-id="@userId">Courses</a>
+                            </li>
+                            @if (userRole == "Student")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Grades" asp-action="IndexForStudent">My Grades</a>
                                 </li>
+                            }
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Details" asp-route-id="@userId">@User.Identity.Name</a>
-                            </li>
+                                </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
-                            </li>
-                        }
-                    </ul>
+                                </li>
+                            }
+                        </ul>
                 </div>
             </div>
         </nav>

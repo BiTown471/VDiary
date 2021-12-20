@@ -74,6 +74,41 @@ namespace VDiary.Migrations
                     b.ToTable("CourseUser");
                 });
 
+            modelBuilder.Entity("VDiary.Models.Grade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GradeMark")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Grade");
+                });
+
             modelBuilder.Entity("VDiary.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -97,6 +132,7 @@ namespace VDiary.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -138,7 +174,8 @@ namespace VDiary.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(55)
+                        .HasColumnType("nvarchar(55)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -161,7 +198,8 @@ namespace VDiary.Migrations
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(55)
+                        .HasColumnType("nvarchar(55)");
 
                     b.HasKey("Id");
 
@@ -200,6 +238,25 @@ namespace VDiary.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("VDiary.Models.Grade", b =>
+                {
+                    b.HasOne("VDiary.Models.Subject", "Subject")
+                        .WithMany("Marks")
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VDiary.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subject");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("VDiary.Models.User", b =>
                 {
                     b.HasOne("VDiary.Models.Role", "Role")
@@ -214,6 +271,11 @@ namespace VDiary.Migrations
             modelBuilder.Entity("VDiary.Models.Course", b =>
                 {
                     b.Navigation("CourseUsers");
+                });
+
+            modelBuilder.Entity("VDiary.Models.Subject", b =>
+                {
+                    b.Navigation("Marks");
                 });
 
             modelBuilder.Entity("VDiary.Models.User", b =>

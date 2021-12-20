@@ -1,7 +1,15 @@
-﻿@model VDiary.Models.User
+﻿@using System.Security.Claims
+@model VDiary.Models.User
 
 @{
     ViewData["Title"] = "Edit";
+    var userId = "";
+    var userRole = "";
+    @if (User.Identity.IsAuthenticated)
+    {
+        userId = @User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        userRole = @User.FindFirst(c => c.Type == ClaimTypes.Role).Value;
+    }
 }
 
 <h1>Edit</h1>
@@ -33,35 +41,52 @@
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="AlbumNumber" class="control-label"></label>
-                <input asp-for="AlbumNumber" class="form-control" />
-                <span asp-validation-for="AlbumNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsDeleted" /> @Html.DisplayNameFor(model => model.IsDeleted)
-                </label>
-            </div>
+            @if (userRole != "Student")
+            {
+                <div class="form-group">
+                    <label asp-for="AlbumNumber" class="control-label"></label>
+                    <input asp-for="AlbumNumber" class="form-control" />
+                    <span asp-validation-for="AlbumNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="IsDeleted" /> @Html.DisplayNameFor(model => model.IsDeleted)
+                    </label>
+                </div>
+            }
+            else
+            {
+                <input asp-for="AlbumNumber" type="hidden" class="form-control" />
+                <input asp-for="IsDeleted" type="hidden" class="form-control" />
+            }
             <div class="form-group">
                 <label asp-for="Signature" class="control-label"></label>
                 <input asp-for="Signature" class="form-control" />
                 <span asp-validation-for="Signature" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="RoleId" class="control-label"></label>
-                <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
-                <span asp-validation-for="RoleId" class="text-danger"></span>
-            </div>
+            @if (userRole == "Admin")
+            {
+                <div class="form-group">
+                    <label asp-for="RoleId" class="control-label"></label>
+                    <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+            }
+            <input asp-for="RoleId" type="hidden" asp-items="ViewBag.RoleId" class="form-control" />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
-
+@if (userRole != "Student")
+{
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to List Users</a>
+</div>
+}
+<div>
+    <a asp-action="Details" asp-route-id="@userId">Back</a>
 </div>
 
 @section Scripts {
