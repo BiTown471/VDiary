@@ -1,0 +1,54 @@
+﻿@model IEnumerable<VDiary.Models.Subject>
+
+@{
+    ViewData["Title"] = "IndexForLecturer";
+}
+
+<h1>IndexForLecturer</h1>
+
+<p>
+    <a asp-action="Create">Add new Grade</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <a asp-action="Create" asp-route-id="@item.Id">Add grade</a> |
+                    <a asp-action="AllGradeForSubject" asp-route-id="@item.Id">All grade</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@{
+    var prevDisabled = !ViewBag.HasPeireviousPage ? "disabled" : "";
+    var nextDisabled = !ViewBag.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="IndexForLecturer"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(ViewBag.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="IndexForLecturer"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(ViewBag.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
