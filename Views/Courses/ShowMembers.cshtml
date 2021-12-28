@@ -18,7 +18,7 @@
 @if (userRole != "Student")
 {
     <p>
-        <a asp-action="AddStudent" asp-route-id="@ViewData["CourseId"]">Add Student</a>
+        <a asp-action="AddStudent" asp-route-id="@ViewData["SubjectId"]" asp-route-courseId="@ViewData["CourseId"]">Add Student</a>
     </p>
 }
 <table class="table">
@@ -27,13 +27,15 @@
             <th>
                 @Html.DisplayNameFor(model => model.FullName)
             </th>
-            @if(userRole != "Student")
+            @*@if(userRole != "Student")
             {
                 <th>
                     @Html.DisplayNameFor(model => model.IsDeleted)
                 </th>
                 <th></th>
-            }
+            }*@
+            <th></th>
+            
         </tr>
     </thead>
     <tbody>
@@ -45,11 +47,12 @@
                 </td>
                 @if(userRole != "Student")
                 {
-                    <td>
+                    @*<td>
                         @Html.DisplayFor(modelItem => item.IsDeleted)
-                    </td>
+                    </td>*@
+                    
                     <td>
-                        <form asp-action="DeleteStudentFromCourse" asp-route-Id="@item.Id">
+                        <form asp-action="DeleteStudentFromCourse" asp-route-courseId="@ViewData["CourseId"]" asp-route-id="@item.Id">
                             <input type="hidden" asp-for="@item.Id" />
                             <input type="submit" value="Delete" class="btn btn-danger" />
 

@@ -47,31 +47,11 @@ namespace VDiary.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LecturerId");
+
                     b.HasIndex("SubjectId");
 
                     b.ToTable("Course");
-                });
-
-            modelBuilder.Entity("VDiary.Models.CourseUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CourseUser");
                 });
 
             modelBuilder.Entity("VDiary.Models.Grade", b =>
@@ -138,6 +118,31 @@ namespace VDiary.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Subject");
+                });
+
+            modelBuilder.Entity("VDiary.Models.SubjectUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BelongsTo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SubjectUser");
                 });
 
             modelBuilder.Entity("VDiary.Models.User", b =>
@@ -210,44 +215,52 @@ namespace VDiary.Migrations
 
             modelBuilder.Entity("VDiary.Models.Course", b =>
                 {
+                    b.HasOne("VDiary.Models.User", "Lecturer")
+                        .WithMany()
+                        .HasForeignKey("LecturerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("VDiary.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Lecturer");
+
                     b.Navigation("Subject");
-                });
-
-            modelBuilder.Entity("VDiary.Models.CourseUser", b =>
-                {
-                    b.HasOne("VDiary.Models.Course", "Course")
-                        .WithMany("CourseUsers")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VDiary.Models.User", "User")
-                        .WithMany("CourseUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("VDiary.Models.Grade", b =>
                 {
                     b.HasOne("VDiary.Models.Subject", "Subject")
-                        .WithMany("Marks")
+                        .WithMany("Grade")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("VDiary.Models.User", "User")
                         .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subject");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("VDiary.Models.SubjectUser", b =>
+                {
+                    b.HasOne("VDiary.Models.Subject", "Subject")
+                        .WithMany("SubjectUser")
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VDiary.Models.User", "User")
+                        .WithMany("SubjectUser")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -268,19 +281,16 @@ namespace VDiary.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("VDiary.Models.Course", b =>
-                {
-                    b.Navigation("CourseUsers");
-                });
-
             modelBuilder.Entity("VDiary.Models.Subject", b =>
                 {
-                    b.Navigation("Marks");
+                    b.Navigation("Grade");
+
+                    b.Navigation("SubjectUser");
                 });
 
             modelBuilder.Entity("VDiary.Models.User", b =>
                 {
-                    b.Navigation("CourseUsers");
+                    b.Navigation("SubjectUser");
                 });
 #pragma warning restore 612, 618
         }

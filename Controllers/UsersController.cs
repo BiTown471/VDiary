@@ -69,8 +69,13 @@ namespace VDiary.Controllers
             {
                 ViewBag.data = items;
             }
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            if (userRole == "Lecturer")
+            {
+                ViewBag.data = items.Where(r => r.Name == "Student");
+            }
 
-            ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id");
+           // ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id");
             return View();
         }
 

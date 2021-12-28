@@ -136,6 +136,12 @@ namespace VDiary.Controllers
             var subject = await _context.Subject.FindAsync(id);
             _context.Subject.Remove(subject);
             await _context.SaveChangesAsync();
+
+            var relations = _context.SubjectUser.Where(su => su.SubjectId == id);
+            foreach (var relation in relations)
+            {
+                _context.SubjectUser.Remove(relation);
+            }
             return RedirectToAction(nameof(Index));
         }
 

@@ -50,9 +50,7 @@ namespace VDiary.Models
         [Display(Name = "Role")]
         public int RoleId { get; set; }
         public virtual Role Role { get; set; }
-        //public ICollection<Course> Courses { get; set; }
-        //public List<CourseUser> CourseUsers { get; set; }
-        public ICollection<CourseUser> CourseUsers { get; set; }
+        public ICollection<SubjectUser> SubjectUser { get; set; }
                       
     }
 }

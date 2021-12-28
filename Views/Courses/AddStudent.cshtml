@@ -5,16 +5,13 @@
     ViewData["Title"] = "Edit";
     ViewData["filter"] = "";
 }
-<form asp-action="AddStudent" method="get" asp-route-id="@ViewData["CourseId"]">
+<form asp-action="AddStudent" method="get" asp-route-id="@ViewData["SubjectId"]" asp-route-courseId="@ViewData["CourseId"]">
     
     <p>
         Find by name: <input type="text" name="filter" value="@ViewData["filter"]" />
         <input type="submit" value="Search" class="btn btn-primary" /> |
-        <a asp-action="AddStudent" asp-route-id="@ViewData["CourseId"]">Back to Full List</a>
+        <a asp-action="AddStudent" asp-route-d="@ViewData["CourseId"]">Back to Full List</a>
     </p>
-    @*<div class="form-group">
-        <input type="submit" value="Search" class="btn btn-primary" />
-    </div>*@
 </form>
 <table class="table">
     <thead>
@@ -33,7 +30,7 @@
                     @Html.DisplayFor(modelItem => item.FullName)
                 </td>
                 <td>
-                    <form asp-controller="Courses" asp-action="AddStudent" asp-route-UserId="@item.Id" asp-route-CourseId="@ViewData["CourseId"]">
+                    <form asp-controller="Courses" asp-action="AddStudent" asp-route-userId="@item.Id" asp-route-subjectId="@ViewData["SubjectId"]" asp-route-courseId="@ViewData["CourseId"]">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <div class="form-group">
                             <input type="submit" value="Add User" class="btn btn-primary" />
@@ -45,7 +42,7 @@
     </tbody>
 </table>
 <div>
-    <a asp-action="ShowMembers" asp-route-id="@ViewData["CourseId"]">Back to List</a>
+    <a asp-action="ShowMembers" asp-route-subjectId="@ViewData["SubjectId"]" asp-route-courseId="@ViewData["CourseId"]" asp-route-lecturerId="@ViewData["lecturerId"]">Back to List</a>
 </div>
 
 @section Scripts {

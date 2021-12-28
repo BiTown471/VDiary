@@ -11,7 +11,7 @@ using VDiary.Models;
 
 namespace VDiary.Controllers
 {
-    [Authorize(Roles = "Admin,Lecturer")]
+    [Authorize(Roles = "Admin")]
     public class RolesController : Controller
     {
         private readonly ApplicationDbContext _context;

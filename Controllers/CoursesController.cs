@@ -41,8 +41,7 @@ namespace VDiary.Controllers
             }
             var applicationDbContext = await _context.Course
                 .Include(c => c.Subject)
-                .Include(c => c.CourseUsers)
-                .ThenInclude(cu => cu.User)
+                .Include(c => c.Lecturer)
                 .OrderBy(c => c.Time)
                 .ToListAsync();
             if (userRole != "Admin")
@@ -51,11 +50,10 @@ namespace VDiary.Controllers
                 {
                     applicationDbContext = await _context.Course
                         .Include(c => c.Subject)
-                        .Include(c => c.CourseUsers)
-                        .ThenInclude(cu => cu.User)
+                        .Include(c => c.Lecturer)
                         .OrderBy(c => c.Time)
-                        .Where(c =>
-                        c.CourseUsers.FirstOrDefault(cu => cu.UserId == id).UserId == userId).ToListAsync(); ;
+                        .Where(c => c.Lecturer.Id== userId)
+                        .ToListAsync();
                 }
                 catch (Exception e)
                 {
@@ -63,12 +61,12 @@ namespace VDiary.Controllers
                     return RedirectToAction("Index", "Home");
                 }
             }
-            var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
-            var pList = new PaginatedList<CourseDto>(courses, courses.Count, pageNumber ?? 1, pageSize);
+            //var courses = _mapper.Map<List<CourseDto>>(applicationDbContext);
+            var pList = new PaginatedList<Course>(applicationDbContext, applicationDbContext.Count, pageNumber ?? 1, pageSize);
             ViewData["HasPeireviousPage"] = pList.HasPreviousPage;
             ViewData["HasNextPage"] = pList.HasNextPage;
             ViewData["PageIndex"] = pList.PageIndex;
-            return View(await PaginatedList<CourseDto>.Create(courses, pageNumber ?? 1, pageSize));
+            return View(await PaginatedList<Course>.Create(applicationDbContext, pageNumber ?? 1, pageSize));
             //return NotFound();
         }
 
@@ -114,11 +112,13 @@ namespace VDiary.Controllers
         [Authorize(Roles = "Lecturer,Admin")]
         public async Task<IActionResult> Create([Bind("SubjectId,LecturerId,Time,Venue,GroupName")] Course course)
         {
-            var relation = new CourseUser();
-            relation.CourseId = course.Id;
+            var relation = new SubjectUser();
+            relation.SubjectId = course.Id;
             relation.UserId = course.LecturerId;
-            relation.Course = course;
+            relation.Subject = _context.Subject.Find(course.SubjectId);
             relation.User = _context.User.Find(course.LecturerId);
+            relation.BelongsTo = course.LecturerId;
+
             if (course.Time < DateTime.Now)
             {
                 course.Active = false;
@@ -132,9 +132,9 @@ namespace VDiary.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(course);
-                _context.CourseUser.Add(relation);
+                _context.SubjectUser.Add(relation);
                 await _context.SaveChangesAsync();
-                //_context.SaveChanges();
+                _context.SaveChanges();
                 if (Content("Admin").Content == "Admin")
                 {
                     return RedirectToAction(nameof(Index), new { id = 1});
@@ -186,7 +186,7 @@ namespace VDiary.Controllers
             course = courseOld;
             course.Time = newDate;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);            
-            var realations = _context.CourseUser.Where(cu => cu.CourseId == id);
+            var realations = _context.SubjectUser.Where(cu => cu.SubjectId == id);
             
 
             if (ModelState.IsValid)
@@ -196,9 +196,9 @@ namespace VDiary.Controllers
                 var newId = _context.Course.OrderBy(c => c.Id).Last().Id;
                 foreach (var courseUser in realations)
                 {
-                    courseUser.CourseId = newId;
+                    courseUser.SubjectId = newId;
                     courseUser.Id = 0;
-                    _context.CourseUser.Add(courseUser);
+                    _context.SubjectUser.Add(courseUser);
                 }
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index),new {id = userId});
@@ -219,7 +219,7 @@ namespace VDiary.Controllers
 
             var courseDbContext =  await  _context.Course
                 .Include(c => c.Subject)
-                .Include(c => c.CourseUsers)
+                //.Include(c => c.SubjectUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
 
@@ -312,7 +312,7 @@ namespace VDiary.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var course = await _context.Course.FindAsync(id);
-            _context.Course.Remove(course);
+            _context.Remove(course);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index),new{id = course.LecturerId});
         }
@@ -323,87 +323,103 @@ namespace VDiary.Controllers
         }
 
         // GET: Courses/ShowMembers/5
-        public async Task<IActionResult> ShowMembers(int? id)
+        public async Task<IActionResult> ShowMembers(int? courseId, int? subjectId,int? lecturerId)
         {
-            if (id == null)
+            if (subjectId == null)
             {
                 return NotFound();
             }
 
-            var course = _context.CourseUser
-                .Include(cu => cu.User)
-                .Where(c => c.CourseId == id)
-                .Where(c => c.User.RoleId != 2)
+            var users = _context.SubjectUser
+                .Include(su => su.User)
+                .Where(s => s.SubjectId == subjectId)
+                .Where(s => s.User.RoleId != 2)
+                .Where(s => s.BelongsTo == lecturerId)
                 .Select(u => u.User);
 
-            if (course == null)
+            if (users == null)
             {
                 return NotFound();
             }
-            ViewData["CourseId"] = id;
-            return View(course);
+            ViewData["SubjectId"] = subjectId;
+            ViewData["CourseId"] = courseId;
+            return View(users);
         }
         
         //GET Courses/AddStudent/5 
         [Authorize(Roles = "Lecturer")]
-        public async Task<IActionResult> AddStudent(int? id, string? filter)  /// it is  course id 
+        public async Task<IActionResult> AddStudent(int? id,int? courseId, string? filter)  /// it is  subject id 
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var useres =  await _context.User
-                .Include(u =>u.CourseUsers)
-                .ThenInclude(cu => cu.Course)
-                .Where(u => u.RoleId != 1 && u.RoleId != 2)
-                .Where(u => u.CourseUsers.All(cu => cu.CourseId != id))
+            var lecturer = _context.Course.FirstOrDefault(c => c.Id == courseId).LecturerId;
+
+            var useres = await _context.SubjectUser
+                .Include(su => su.User)
+                .Include(su => su.Subject)
+                .Where(su => su.User.Role.Id == 3)
+                .Where(su => su.BelongsTo == lecturer)
+                .Where(su => su.SubjectId != id)
+                .Select(su => su.User)
                 .ToListAsync();
             if (filter is not null)
             {
-                useres =useres.Where(u => u.FullName.Contains(filter)).ToList();
+                useres = useres.Where(u => u.FullName.Contains(filter)).ToList();
             }
 
-            ViewData["CourseId"] = id;
+            ViewData["SubjectId"] = id;
+            ViewData["CourseId"] = courseId;
+            ViewData["lecturerId"] = lecturer;
             return View(useres);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Lecturer")]
-        public async Task<IActionResult> AddStudent(int CourseId, int UserId)
+        public async Task<IActionResult> AddStudent(int SubjectId, int userId,int CourseId)
         {
-            var relation = new CourseUser();
-            relation.CourseId = CourseId;
-            relation.UserId = UserId;
-            relation.Course = _context.Course.Find(CourseId);
-            relation.User = _context.User.Find(UserId);
+            var relation = new SubjectUser();
+            relation.SubjectId = SubjectId;
+            relation.UserId = userId;
+            relation.Subject = _context.Subject.Find(SubjectId);
+            relation.User = _context.User.Find(userId);
+            relation.BelongsTo = _context.Course.Find(CourseId).LecturerId;
 
-            if (CourseId == null)
+            if (SubjectId == null)
             {
                 return NotFound();
             }
 
-            if (UserId == null)
+            if (userId == null)
             {
                 return NotFound();
             }
 
-            _context.CourseUser.Add(relation);
+            _context.SubjectUser.Add(relation);
             _context.SaveChanges();
 
-            return RedirectToAction("ShowMembers", new {id = CourseId});
+            return RedirectToAction("ShowMembers", new
+            {
+                courseId = CourseId,
+                subjectId = SubjectId,
+
+
+            });
         }
 
         [HttpPost]
         [Authorize(Roles = "Lecturer")]
-        public async Task<IActionResult> DeleteStudentFromCourse(int id)
+        public async Task<IActionResult> DeleteStudentFromCourse(int id,int courseId)
         {
-            var course =_context.CourseUser
-                .Where(cu => cu.UserId == id)
+            var course = _context.SubjectUser
+                .Where(su => su.UserId == id)
                 .FirstOrDefault();
-            _context.CourseUser.Remove(course);
+            _context.SubjectUser.Remove(course);
             await _context.SaveChangesAsync();
-            return RedirectToAction("ShowMembers", new { id = course.CourseId});
+            return RedirectToAction("ShowMembers", new { subjectId = course.SubjectId });
+            
         }
 
        

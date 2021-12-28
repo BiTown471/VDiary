@@ -13,6 +13,7 @@ namespace VDiary.Models
         [Required]
         [MinLength(3)]
         public string Name { get; set; }
-        public ICollection<Grade> Marks { get; set; }
+        public ICollection<Grade> Grade { get; set; }
+        public ICollection<SubjectUser> SubjectUser { get; set; }
     }
 }

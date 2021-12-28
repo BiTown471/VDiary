@@ -17,14 +17,13 @@ namespace VDiary.Models
         public virtual Subject Subject { get; set; }
         [Required]
         public int LecturerId { get; set; }
+        public virtual User Lecturer { get; set; }
         [Required]
         public DateTime Time { get; set; }
         [MaxLength(10)]
         public string Venue { get; set; } // place
         public string GroupName { get; set; }
         public bool Active { get; set; }
-        //public ICollection<User> Users{ get; set; }
-        //public List<CourseUser> CourseUsers{ get; set; }
-        public ICollection<CourseUser> CourseUsers { get; set; }
+        //public ICollection<SubjectUser> SubjectUser { get; set; }
     }
 }
