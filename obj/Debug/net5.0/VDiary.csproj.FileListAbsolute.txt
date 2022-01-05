@@ -173,7 +173,13 @@ C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\VDiar
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\ref\VDiary.dll
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\VDiary.pdb
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\VDiary.genruntimeconfig.cache
-C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\VDiary.csproj.AssemblyReference.cache
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Grades\CreateDefault.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Grades\AllGradeForSubject.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Grades\IndexForLecturer.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\PresencesForCourse.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\Create.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\VDiary.csproj.AssemblyReference.cache
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\presencesForSubject.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\PresencesForStudent.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Users\ChangePassword.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Subjects\Details.cshtml.g.cs

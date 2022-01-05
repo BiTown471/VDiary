@@ -15,9 +15,9 @@ namespace VDiary.Data
         public DbSet<VDiary.Models.Subject> Subject { get; set; }
         public DbSet<VDiary.Models.User> User { get; set; }
         public DbSet<VDiary.Models.Course> Course { get; set; }
-        //public DbSet<VDiary.Models.CourseUser> CourseUser { get; set; }
         public DbSet<VDiary.Models.SubjectUser> SubjectUser { get; set; }
         public DbSet<VDiary.Models.Grade> Grade { get; set; }
+        public DbSet<VDiary.Models.Presence> Presence { get; set; }
         
     }
 }
