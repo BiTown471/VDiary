@@ -7,66 +7,50 @@
     var subject = ViewBag.Subject;
 }
 
-<h1>These are all grades from  @subject  </h1>
+<h1>These are all grades from  @subject.Name  </h1>
+<a asp-action="Create" asp-route-id="@subject.Id">Add grade</a> 
 
 
 <table class="table">
     <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.User.FullName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.GradeMark)
-        </th>
-        <th></th>
-    </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.User.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GradeMark)
+            </th>
+            <th></th>
+        </tr>
     </thead>
     <tbody>
 
-    @foreach (var student in @students)
-    {
-        <tr>
-            <td>
-                @student.FullName
-            </td>
-            @foreach (var group in Model.GroupBy(item => item.User.FullName))
-            {
-
-                if (@student.FullName == group.Key)
-                {
-                
-            
-                    <td>
-                        @foreach (var item in group)
-                        {
-
-                            @Html.DisplayFor(modelItem => item.GradeMark)
-                            @:&nbsp;
-                        }
-                    </td>
-                } 
-            
-            }
-        </tr>
-    }
-
-    @*@foreach (var student in @students)
-    {
-        <tr>
-            <td>
-                @student.FullName
-            </td>
-            <td>
-                @foreach (var item in group)
+        @foreach (var student in @students)
+        {
+            <tr>
+                <td>
+                    @student.FullName
+                </td>
+                @foreach (var group in Model.GroupBy(item => item.User.FullName))
                 {
 
-                    @Html.DisplayFor(modelItem => item.GradeMark)
-                    @:&nbsp;
+                    if (@student.FullName == group.Key)
+                    {
+
+
+                        <td>
+                            @foreach (var item in group)
+                            {
+
+                                @Html.DisplayFor(modelItem => item.GradeMark)
+                                @:&nbsp;
+                            }
+                        </td>
+                    }
+
                 }
-            </td>
-        </tr>
-    }*@
+            </tr>
+        }
     </tbody>
 </table>
 

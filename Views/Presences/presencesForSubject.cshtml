@@ -1,0 +1,55 @@
+﻿@model IEnumerable<VDiary.Models.Presence>
+@using System.Security.Claims
+
+
+
+@{
+    ViewData["Title"] = "IndexForLecturer";
+    var students = ViewBag.Students;
+    var subject = ViewBag.Subject;
+    var userRole = ClaimTypes.NameIdentifier;
+}
+
+@*<h1>These are all  from  @subject.Name  </h1>
+    <a asp-action="Create" asp-route-id="@subject.Id">Add grade</a>*@
+<h1>These are all presences from  @Model.FirstOrDefault().Course.Subject.Name  </h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.User.FullName)
+            </th>
+            @foreach (var date in Model.GroupBy(item => item.Time).Distinct())
+            {
+                <th>
+                    @Html.DisplayFor(modelItem => date.Key)
+                </th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var group in Model.GroupBy(item => item.User.FullName))
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => group.Key)
+                </td>
+                @foreach (var item in group)
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Active)
+                    </td>
+                }
+
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+<div>
+    <a href="javascript:history.go(-1)">Back to List</a>
+</div>

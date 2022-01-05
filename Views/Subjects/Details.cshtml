@@ -1,0 +1,31 @@
+﻿@model IEnumerable<VDiary.Models.User>
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Lecturer connected witch Subject @ViewBag.Subject.Name  </h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<div>
+    <a href="javascript:history.go(-1)">Back to List</a>
+</div>

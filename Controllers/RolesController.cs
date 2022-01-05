@@ -39,6 +39,7 @@ namespace VDiary.Controllers
 
             var role = await _context.Role
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (role == null)
             {
                 return NotFound();

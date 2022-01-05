@@ -29,6 +29,7 @@ namespace VDiary.Models
         public string AlbumNumber { get; set; }
         public DateTime LastLoggedIn { get; set; }
         public DateTime DateCreated { get; set; }
+        [Display(Name = "Expiry Days")]
         public int AccountExpiryDays { get; set; }
         public int MaxLoginAttemps { get; set; } = 5;
         public int FilledLoginAtemps { get; set; } = 0;
@@ -36,6 +37,7 @@ namespace VDiary.Models
         public bool IsDeleted { get; set; }
         [Range(1, Int32.MaxValue)]
         public string Signature { get; set; }
+        [Display(Name = "Reset Request")]
         public DateTime DateResetRequest { get; set; }
 
         [Display(Name = "Full Name")]
@@ -51,6 +53,6 @@ namespace VDiary.Models
         public int RoleId { get; set; }
         public virtual Role Role { get; set; }
         public ICollection<SubjectUser> SubjectUser { get; set; }
-                      
+
     }
 }

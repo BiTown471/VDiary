@@ -1,0 +1,50 @@
+﻿@using Microsoft.EntityFrameworkCore
+@model IEnumerable<VDiary.Models.Presence>
+
+
+@{
+    ViewData["Title"] = "IndexForLecturer";
+    var students = ViewBag.Students;
+    var subject = ViewBag.Subject;
+    var courseId = ViewBag.CourseId;
+}
+
+<h1>These are all presences from  @subject.Name  on @Model.FirstOrDefault().Time </h1>
+<a asp-action="Create" asp-route-id="@subject.Id">Add grade</a>
+
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.User.FullName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Active)
+        </th>
+        <th></th>
+        
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var presence in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => presence.User.FullName)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => presence.Active)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-controller="Courses" asp-action="Index" asp-route-id="@subject.Id">Back to List</a>
+</div>
+<div>
+    <a asp-action="Create" asp-route-courseId="@courseId" asp-route-subjectId="@subject.Id" asp-route-lecturerId="">Check presence</a>
+</div>

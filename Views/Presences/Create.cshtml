@@ -1,0 +1,89 @@
+﻿@*@model VDiary.Models.Presence*@
+@using System.Linq
+@model List<VDiary.Models.Presence>
+@{
+    ViewData["Title"] = "Create";
+    var course = Model[0].Course;
+}
+
+<h1>Create</h1>
+
+<h4>Presence</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+    
+        <form asp-action="Create">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model[0].User.FullName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model[0].Active)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int row = 0 ; row < Model.Count(); row++)
+                    {
+                        @Html.HiddenFor(item => item[row].UserId)
+                        @Html.HiddenFor(item => item[row].CourseId)
+                        @Html.HiddenFor(item => item[row].Id)
+                        @Html.HiddenFor(item => item[row].Time @*, new { Value = time}*@)
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(item => item[row].User.FullName)
+                            </td>
+                            <td >
+                                @Html.EditorFor(item => item[row].Active)
+                            </td>
+                        </tr>
+                        @*<tr>
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <input type="hidden" asp-for="@Model[row]" class="form-control" asp-items="@item.CourseUserId">
+                            </div>
+
+                            <td>
+
+                                <div class="form-group form-check">
+                                    <label class="form-check-label">
+                                        @item.CourseUser.User.FullName <input class="form-check-input" asp-for="@item.Active" />
+                                    </label>
+                                </div>
+                            </td>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+
+                                </label>
+                            </div>
+                        </tr>
+                        <div class="form-group">
+                    <label asp-for="Time" class="control-label"></label>
+                    <input asp-for="Time" class="form-control" />
+                    <span asp-validation-for="Time" class="text-danger"></span>
+                </div>*@
+                    }
+
+                </tbody>
+                
+            </table>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    
+    
+    </div>
+</div>
+
+<div>
+    <a asp-action="PresencesForCourse" asp-route-courseId ="@course.Id" asp-route-subjectId="@course.SubjectId">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

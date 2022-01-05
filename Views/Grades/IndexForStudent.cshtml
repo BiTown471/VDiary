@@ -16,33 +16,41 @@
             <th>
                 @Html.DisplayNameFor(model => model.GradeMark)
             </th>
-            <th></th>
+
         </tr>
     </thead>
     <tbody>
-
-        @foreach (var group in Model.GroupBy(item => item.Subject.Name))
-        {
-
+    @foreach (var subject in @ViewBag.Subjects)
+    {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => group.Key)
-            </td>
+                @subject.Name
 
-            @foreach (var item in group)
-            {
-                <td>
-                    @Html.DisplayFor(modelItem => item.GradeMark)
-                </td>
+            </td>
+            <td>
+                @foreach (var group in Model.GroupBy(item => item.Subject.Name))
+                {
+                    @if (@subject.Name == group.Key)
+                    {
+                        @foreach (var item in group)
+                        {
+
+                            @Html.DisplayFor(modelItem => item.GradeMark)
+
+                        }
                     }
-                
+                }
+            </td>
+            <td>
+                <a asp-controller="Presences" asp-action="PresencesForSubject" asp-route-subjectId="@subject.Id">Show presence</a>
+            </td>
             </tr>
-        }
+    }
     </tbody>
 </table>
 
 @{
-    var prevDisabled = !ViewBag.HasPeireviousPage ? "disabled" : "";
+    var prevDisabled = !ViewBag.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !ViewBag.HasNextPage ? "disabled" : "";
 }
 

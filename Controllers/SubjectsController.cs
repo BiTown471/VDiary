@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using VDiary.Data;
 using VDiary.Models;
 
@@ -31,6 +32,8 @@ namespace VDiary.Controllers
         // GET: Subjects/Create
         public IActionResult Create()
         {
+           
+            ViewData["Reffer"] = Request.Headers["Referer"].ToString();
             return View();
         }
 
@@ -39,14 +42,20 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name")] Subject subject)
+        public async Task<IActionResult> Create([Bind("Name")] Subject subject,string? url)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(subject);
                 await _context.SaveChangesAsync();
+                if (url is not null)
+                {
+                    return Redirect(url);
+                }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(subject);
         }
 
@@ -148,6 +157,31 @@ namespace VDiary.Controllers
         private bool SubjectExists(int id)
         {
             return _context.Subject.Any(e => e.Id == id);
+        }
+
+        public IActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var su = _context.SubjectUser
+                .Include(su => su.User)
+                .Include(su => su.Subject)
+                .Where(su => su.BelongsTo == su.UserId)
+                .Where(su => su.SubjectId == id )
+                .Select(su => su.User)
+                ;
+
+            ViewData["Subject"] = _context.Subject.Find(id);
+
+            if (su == null)
+            {
+                return NotFound();
+            }
+
+            return View(su);
         }
     }
 }

@@ -66,14 +66,15 @@
                     @Html.DisplayFor(modelItem => item.Active)
                 </td>
                 <td>
-                    @if(userRole != "Student")
+                    @if (userRole != "Student")
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id">Edit </a>
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a>
                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-
+                        <a asp-action="ShowMembers" asp-route-courseId="@item.Id" asp-route-subjectId="@item.SubjectId" asp-route-lecturerId="@item.LecturerId">Show members</a>
                     }
-                    <a asp-action="ShowMembers" asp-route-courseId="@item.Id" asp-route-subjectId="@item.SubjectId" asp-route-lecturerId="@item.LecturerId">Show members</a>
+                    @*<a asp-controller="Presences" asp-action="PresencesForCourse" asp-route-courseId="@item.Id" asp-route-subjectId="@item.SubjectId" asp-route-lecturerId="@item.LecturerId">Show presences</a>*@
+                    <a asp-controller="Presences" asp-action="PresencesForSubject" asp-route-subjectId="@item.SubjectId">Show presences</a>
                 </td>
             </tr>
         }
@@ -81,7 +82,7 @@
 </table>
 
 @{
-    var prevDisabled = !ViewBag.HasPeireviousPage ? "disabled" : "";
+    var prevDisabled = !ViewBag.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !ViewBag.HasNextPage ? "disabled" : "";
 }
 

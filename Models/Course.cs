@@ -24,6 +24,5 @@ namespace VDiary.Models
         public string Venue { get; set; } // place
         public string GroupName { get; set; }
         public bool Active { get; set; }
-        //public ICollection<SubjectUser> SubjectUser { get; set; }
     }
 }

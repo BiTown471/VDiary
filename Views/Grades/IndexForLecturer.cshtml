@@ -4,11 +4,11 @@
     ViewData["Title"] = "IndexForLecturer";
 }
 
-<h1>IndexForLecturer</h1>
+<h1>My Course</h1>
 
-<p>
+@*<p>
     <a asp-action="Create">Add new Grade</a>
-</p>
+</p>*@
 <table class="table">
     <thead>
         <tr>
@@ -21,20 +21,23 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    <a asp-action="Create" asp-route-id="@item.Id">Add grade</a> |
-                    <a asp-action="AllGradeForSubject" asp-route-id="@item.Id">All grade</a>
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                <a asp-action="AllGradeForSubject" asp-route-id="@item.Id">Show grades</a> |
+                <a asp-controller="Presences" asp-action="PresencesForSubject"  asp-route-subjectId="@item.Id">Show presence</a>
+            </td>
+            
+                
+            
+        </tr>
         }
     </tbody>
 </table>
 @{
-    var prevDisabled = !ViewBag.HasPeireviousPage ? "disabled" : "";
+    var prevDisabled = !ViewBag.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !ViewBag.HasNextPage ? "disabled" : "";
 }
 

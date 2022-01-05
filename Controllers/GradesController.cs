@@ -23,33 +23,27 @@ namespace VDiary.Controllers
             _context = context;
         }
 
-        // GET: Grades
+        // GET: Grades/IndexForLecturer/1
         public async Task<IActionResult> IndexForLecturer(int? pageNumber)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var pageSize = 5;
 
-            if (pageNumber is null)
-            {
-                pageNumber = 1;
-            }
-            var applicationDbContext = _context.SubjectUser
-                //.Include(g => g.Subject)
-                .Where(g => g.BelongsTo == userId )
+            var applicationDbContext = await _context.SubjectUser
+                    .Where(g => g.BelongsTo == userId )
                 .Select(su => su.Subject)
                 .Distinct()
-                .ToList()
+                .ToListAsync()
                 ;
 
 ;
             var grades = new PaginatedList<Subject>(applicationDbContext, applicationDbContext.Count, pageNumber ?? 1, pageSize);
-            ViewData["HasPeireviousPage"] = grades.HasPreviousPage;
+            ViewData["HasPreviousPage"] = grades.HasPreviousPage;
             ViewData["HasNextPage"] = grades.HasNextPage;
             ViewData["PageIndex"] = grades.PageIndex;
             return View(await PaginatedList<Subject>.Create(grades, pageNumber ?? 1, pageSize));
-            //return View(await applicationDbContext.ToListAsync());
         }
-
+        // GET: Grades/IndexForStudent/1
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> IndexForStudent(int? pageNumber)
         {
@@ -59,10 +53,6 @@ namespace VDiary.Controllers
 
             var pageSize = 5;
 
-            if (pageNumber is null)
-            {
-                pageNumber = 1;
-            }
             var applicationDbContext = _context.Grade
                 .Include(m => m.Subject)
                 .Include(m => m.User)
@@ -71,9 +61,15 @@ namespace VDiary.Controllers
                 .ToList()
                 ;
 
+            ViewData["Subjects"] = await _context.SubjectUser
+                .Include(su => su.User)
+                .Include(su => su.Subject)
+                .Where(su => su.UserId == userId)
+                .Select(su => su.Subject)
+                .ToListAsync();
 
             var grades = new PaginatedList<Grade>(applicationDbContext, applicationDbContext.Count, pageNumber ?? 1, pageSize);
-            ViewData["HasPeireviousPage"] = grades.HasPreviousPage;
+            ViewData["HasPreviousPage"] = grades.HasPreviousPage;
             ViewData["HasNextPage"] = grades.HasNextPage;
             ViewData["PageIndex"] = grades.PageIndex;
             return View(await PaginatedList<Grade>.Create(grades, pageNumber ?? 1, pageSize));
@@ -86,9 +82,10 @@ namespace VDiary.Controllers
         {
 
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var subjects = _context.Course
+            var subjects =  _context.Course
                 .Where(c => c.LecturerId == userId)
-                .Select(c => c.Subject);
+                .Select(c => c.Subject)
+                ;
 
             var students = _context.SubjectUser
                 .Where(su => su.BelongsTo == userId)
@@ -99,7 +96,7 @@ namespace VDiary.Controllers
             ViewData["UserId"] = new SelectList(students, "Id", "FullName");
             return View();
         }
-        // GET: Marks/Create
+        // GET: Marks/Create/1
         [Authorize(Roles = "Lecturer")]
         public IActionResult Create(int? id)// subjectID,
         {
@@ -108,7 +105,8 @@ namespace VDiary.Controllers
                 return RedirectToAction("CreateDefault");
             }
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var subject = _context.Subject.FirstOrDefault(s => s.Id == id );
+            var subject =  _context.Subject
+                .FirstOrDefault(s => s.Id == id );
 
             var students = _context.SubjectUser
                 .Where(su => su.BelongsTo == userId)
@@ -241,27 +239,26 @@ namespace VDiary.Controllers
                 return NotFound();
             }
             var lecturerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var subjectName = "";
+            var subject = _context.Subject.FirstOrDefault(s => s.Id == id);
             var grades = await _context.Grade
                 .Include(g => g.Subject)
                 .Include(g => g.User)
                 .Where(g => g.SubjectId == id)
                 .Where(g => g.CreatedBy == lecturerId)
                 .ToListAsync();
-            if (grades.Count == 0)
-            {
-                ViewData["Subject"] = _context.Subject.FirstOrDefault(s => s.Id == id).Name;
-                subjectName = _context.Subject.FirstOrDefault(s => s.Id == id).Name;
-            }
 
-             ViewData["Students"]= _context.User
+            ViewData["Subject"] = subject;
+
+            ViewData["Students"]= await _context.User
                 .Include(u => u.SubjectUser)
                 .Where(u => u.SubjectUser.FirstOrDefault(su => su.BelongsTo== lecturerId ).BelongsTo == lecturerId)
-                .Where(u => u.SubjectUser.FirstOrDefault(su => su.Subject.Name == subjectName).Subject.Name == subjectName)
+                .Where(u => u.SubjectUser.FirstOrDefault(su => su.Subject.Name == subject.Name).Subject.Name == subject.Name)
                 .Where(u => u.Role.Name == "Student")
+                .ToListAsync()
                 ;
 
             return View(grades);
         }
+
     }
 }

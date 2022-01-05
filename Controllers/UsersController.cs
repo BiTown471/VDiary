@@ -24,7 +24,7 @@ namespace VDiary.Controllers
         }
 
         // GET: Users
-        [Authorize(Roles= "Admin,Lecturer")]
+        [Authorize(Roles= "Admin")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.User.Include(u => u.Role);
@@ -106,6 +106,69 @@ namespace VDiary.Controllers
             ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id", user.RoleId);
             return View(user);
         }
+        public async Task<IActionResult> ChangePassword(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != id.ToString())
+            {
+                return RedirectToAction("Denied", "Home");
+            }
+            
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Name", user.RoleId);
+            return View(user);
+        }
+
+        [HttpPost, ActionName("ChangePassword")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePasswordPost(int? id)
+        {
+            if (id is null)
+            {
+                return NotFound();
+            }
+
+            var userToUpdate = await _context.User.FirstOrDefaultAsync(u => u.Id == id);
+            if (ModelState.IsValid)
+            {
+                if (await TryUpdateModelAsync<User>(
+                    userToUpdate,
+                    "",
+                    u => u.Password                    
+                    )                    
+                )
+                {
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!UserExists(userToUpdate.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                }
+
+                return RedirectToAction("Details", new { id = userToUpdate.Id });
+            }
+           // ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id", userToUpdate.RoleId);
+            return View(userToUpdate);
+        }
+
 
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -119,6 +182,11 @@ namespace VDiary.Controllers
             if (userRole != "Admin" && userId != id.ToString())
             {
                 return RedirectToAction("Denied", "Home");
+            }
+
+            if (userRole != "Admin")
+            {
+                return RedirectToAction("ChangePassword", "Users",new {userId = id});
             }
             var user = await _context.User.FindAsync(id);
             if (user == null)
