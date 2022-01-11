@@ -358,9 +358,11 @@ namespace VDiary.Controllers
                 .Where(u => u.Role.Id == 3)
                 .Where(u=>u.SubjectUser.All(su => su.SubjectId != id))
                 .ToListAsync();
+            ViewData["Students"] = new SelectList(useres, "Id", "FullName"); 
+            
             if (filter is not null)
             {
-                useres = useres.Where(u => u.FullName.Contains(filter)).ToList();
+                useres = useres.Where(u => u.FullName.ToLower().Contains(filter.ToLower())).ToList();
             }
 
             ViewData["SubjectId"] = id;
@@ -371,27 +373,31 @@ namespace VDiary.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Lecturer")]
-        public async Task<IActionResult> AddStudent(int SubjectId, int userId,int CourseId)
+        public async Task<IActionResult> AddStudent(int subjectId, int userId,int courseId,[Bind("Id,FullName")] User user)
         {
+            if (userId == 0)
+            {
+                userId = user.Id;
+            }
             var relationSU = new SubjectUser();
-            relationSU.SubjectId = SubjectId;
+            relationSU.SubjectId = subjectId;
             relationSU.UserId = userId;
-            relationSU.Subject = _context.Subject.Find(SubjectId);
+            relationSU.Subject = _context.Subject.Find(subjectId);
             relationSU.User = _context.User.Find(userId);
-            relationSU.BelongsTo = _context.Course.Find(CourseId).LecturerId;
+            relationSU.BelongsTo = _context.Course.Find(courseId).LecturerId;
 
             var presence = new Presence()
             {
                 Active = false,
-                CourseId = CourseId,
-                Time = _context.Course.Find(CourseId).Time,
+                CourseId = courseId,
+                Time = _context.Course.Find(courseId).Time,
                 UserId = userId
 
             };
             var relations =  await _context.Course
                 .Include(c => c.Subject)
-                .Where(c => c.SubjectId == SubjectId)
-                .Where(c => c.Id != CourseId)
+                .Where(c => c.SubjectId == subjectId)
+                .Where(c => c.Id != courseId)
                 .ToListAsync()
                 ;
 
@@ -401,7 +407,7 @@ namespace VDiary.Controllers
                 {
                     Active = false,
                     CourseId = relation.Id,
-                    Time = _context.Course.Find(CourseId).Time,
+                    Time = _context.Course.Find(courseId).Time,
                     UserId = userId
 
                 };
@@ -413,8 +419,8 @@ namespace VDiary.Controllers
 
             return RedirectToAction("ShowMembers", new
             {
-                courseId = CourseId,
-                subjectId = SubjectId,
+                courseId = courseId,
+                subjectId = subjectId,
             });
         }
 

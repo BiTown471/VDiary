@@ -1,18 +1,27 @@
 ﻿@using System.Security.Claims
+@using System.Linq
 @model IEnumerable<VDiary.Models.User>
 
 @{
     ViewData["Title"] = "Edit";
     ViewData["filter"] = "";
+    var student = new User();
 }
-<form asp-action="AddStudent" method="get" asp-route-id="@ViewData["SubjectId"]" asp-route-courseId="@ViewData["CourseId"]">
-    
-    <p>
-        Find by name: <input type="text" name="filter" value="@ViewData["filter"]" />
-        <input type="submit" value="Search" class="btn btn-primary" /> |
-        <a asp-action="AddStudent" asp-route-d="@ViewData["CourseId"]">Back to Full List</a>
-    </p>
-</form>
+
+<div class="row">
+    <div class="col-sm-4">
+        <form asp-action="AddStudent" asp-route-userId ="" asp-route-courseId="@ViewBag.CourseId" asp-route-subjectId="@ViewBag.subjectId">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label for="courseId" class="control-label">FullName</label>
+                <select id="ddlStudents" class="form-control" asp-for="@Model.First().Id" value="@ViewBag.Students" asp-items="@ViewBag.Students" ></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -47,4 +56,12 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#ddlStudents").select2();
+        });
+    </script>
 }
