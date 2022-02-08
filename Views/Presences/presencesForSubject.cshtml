@@ -5,14 +5,11 @@
 
 @{
     ViewData["Title"] = "IndexForLecturer";
-    var students = ViewBag.Students;
-    var subject = ViewBag.Subject;
-    var userRole = ClaimTypes.NameIdentifier;
+    var userRole = @User.FindFirst(c => c.Type == ClaimTypes.Role).Value;
+    var subjectid = @ViewBag.Subject.Id;
 }
 
-@*<h1>These are all  from  @subject.Name  </h1>
-    <a asp-action="Create" asp-route-id="@subject.Id">Add grade</a>*@
-<h1>These are all presences from  @Model.FirstOrDefault().Course.Subject.Name  </h1>
+<h1>These are all presences from  @ViewBag.Subject.Name witch @ViewBag.Lecturer.FullName</h1>
 
 <table class="table">
     <thead>
@@ -43,7 +40,10 @@
                         @Html.DisplayFor(modelItem => item.Active)
                     </td>
                 }
-
+                @if (userRole == "Lecturer")
+                {
+                <td><a asp-action="AllPresencesOfStudent" asp-route-studentId="@group.FirstOrDefault().UserId" asp-route-subjectId="@subjectid">Edit</a></td>
+                }
             </tr>
         }
 

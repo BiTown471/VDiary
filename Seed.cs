@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VDiary.Data;
 using VDiary.Models;
@@ -10,31 +11,11 @@ namespace VDiary
     public class Seed
     {
         private readonly ApplicationDbContext _dbContext;
-
+        
         public Seed(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
-        public void SeederAll()
-        {
-            if (_dbContext.Database.CanConnect())
-            {
-                if (!_dbContext.Role.Any())
-                {
-                    var role = GetRole();
-                    _dbContext.Role.AddRange(role);
-                    _dbContext.SaveChanges();
-                }
-
-                if (!_dbContext.User.Any())
-                {
-                    var users = GetUser();
-                    _dbContext.User.AddRange(users);
-                    _dbContext.SaveChanges();
-                }
-            }
-        }
-
         private IEnumerable<Role> GetRole()
         {
             var role = new List<Role>()
@@ -62,7 +43,7 @@ namespace VDiary
             {
                 new User()
                 {
-                    
+                    Id = 0,
                     Surname = "Admin",
                     FirstName= "Admin",
                     Password = "password",
@@ -76,12 +57,12 @@ namespace VDiary
                     IsDeleted = false,
                     Signature = "",
                     DateResetRequest= new DateTime(0001,01,01,01,01,01),
-                    RoleId = 1 
+                    RoleId = 1
 
                 },
                 new User()
             {
-
+                Id = 0,
                 Surname = "Jan",
                 FirstName = "Nowak",
                 Password = "password",
@@ -101,7 +82,7 @@ namespace VDiary
 
             new User()
             {
-
+                Id = 0,
                 Surname = "Lewandowski",
                 FirstName = "Robert",
                 Password = "password",
@@ -120,7 +101,7 @@ namespace VDiary
             },
             new User()
             {
-
+                Id = 0,
                 Surname = "Pudzianowski",
                 FirstName = "Mariusz",
                 Password = "password",
@@ -139,7 +120,7 @@ namespace VDiary
             },
             new User()
             {
-
+                Id = 0,
                 Surname = "Odziomek",
                 FirstName = "Monika",
                 Password = "password",
@@ -158,7 +139,7 @@ namespace VDiary
             },
             new User()
             {
-
+                Id = 0,
                 Surname = "Walaszek",
                 FirstName = "Adrian",
                 Password = "password",
@@ -177,7 +158,7 @@ namespace VDiary
             },
             new User()
             {
-
+                Id = 0,
                 Surname = "Kapela",
                 FirstName = "Jan",
                 Password = "password",
@@ -196,7 +177,7 @@ namespace VDiary
             },
             new User()
             {
-
+                Id = 0,
                 Surname = "Małysz",
                 FirstName = "Adam",
                 Password = "password",
@@ -215,7 +196,7 @@ namespace VDiary
             },
             new User()
             {
-
+                Id = 0,
                 Surname = "Stasko",
                 FirstName = "Maja",
                 Password = "password",
@@ -233,11 +214,27 @@ namespace VDiary
 
             },
         };
-
-            
-
             return users;
 
+        }
+        public void SeederAll()
+        {
+            if (_dbContext.Database.CanConnect())
+            {
+                if (!_dbContext.Role.Any())
+                {
+                    var role = GetRole();
+                    _dbContext.Role.AddRange(role);
+                    _dbContext.SaveChanges();
+                }
+
+                if (!_dbContext.User.Any())
+                {
+                    var users = GetUser();
+                    _dbContext.User.AddRange(users);
+                    _dbContext.SaveChanges();
+                }
+            }
         }
     }
 }

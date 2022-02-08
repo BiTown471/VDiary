@@ -1,0 +1,45 @@
+﻿@model IEnumerable<VDiary.Models.Grade>
+
+@{
+    ViewData["Title"] = "AllGradesOfStudent";
+    var userName = ViewBag.UserName;
+}
+
+
+<h1>All Grades Of @userName.FullName</h1>
+
+
+<p>
+    
+    <a asp-action="Create" asp-route-id="@ViewBag.SubjectId">Add grade</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.GradeMark)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.GradeMark)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<a href='javascript:history.go(-1)'>Go Back to Previous Page</a>

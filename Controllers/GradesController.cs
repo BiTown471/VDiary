@@ -35,8 +35,8 @@ namespace VDiary.Controllers
                 .Distinct()
                 .ToListAsync()
                 ;
-
-;
+            ViewData["lecturerId"] = userId;
+            ;
             var grades = new PaginatedList<Subject>(applicationDbContext, applicationDbContext.Count, pageNumber ?? 1, pageSize);
             ViewData["HasPreviousPage"] = grades.HasPreviousPage;
             ViewData["HasNextPage"] = grades.HasNextPage;
@@ -57,6 +57,7 @@ namespace VDiary.Controllers
                 .Include(m => m.Subject)
                 .Include(m => m.User)
                 .Where( m => m.UserId == userId )
+                .Distinct()
                 .AsEnumerable()
                 .ToList()
                 ;
@@ -65,6 +66,7 @@ namespace VDiary.Controllers
                 .Include(su => su.User)
                 .Include(su => su.Subject)
                 .Where(su => su.UserId == userId)
+                .Distinct()
                 .Select(su => su.Subject)
                 .ToListAsync();
 
@@ -75,6 +77,26 @@ namespace VDiary.Controllers
             return View(await PaginatedList<Grade>.Create(grades, pageNumber ?? 1, pageSize));
         }
 
+        public async Task<IActionResult> AllGradesOfStudent(int studentId,int subjectId)
+        {
+
+            if (studentId == 0 || studentId == null)
+            {
+                return NotFound();
+            }
+
+            var results = await _context.Grade
+                .Include(g => g.User)
+                .Where(g => g.UserId == studentId)
+                .Where(g => g.SubjectId == subjectId)
+                .ToListAsync();
+            
+            ViewData["UserName"] = _context.User.SingleOrDefault( u => u.Id == studentId);
+            ViewData["SubjectId"] = subjectId;
+
+
+            return View(results);
+        }
 
         // GET: Marks/Create
         [Authorize(Roles = "Lecturer")]
@@ -119,7 +141,6 @@ namespace VDiary.Controllers
             return View();
         }
 
-
         // POST: Marks/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -142,6 +163,7 @@ namespace VDiary.Controllers
         }
 
         // GET: Marks/Edit/5
+        [Authorize(Roles = "Lecturer")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -164,13 +186,15 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,GradeMark,Date,Description,UserId,SubjectId")] Grade grade)
+        [Authorize(Roles = "Lecturer")]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,GradeMark,Date,Description,UserId,SubjectId,CreatedBy")] Grade grade)
         {
             if (id != grade.Id)
             {
                 return NotFound();
             }
 
+            var subjectId = grade.SubjectId;
             if (ModelState.IsValid)
             {
                 try
@@ -180,7 +204,7 @@ namespace VDiary.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MarkExists(grade.Id))
+                    if (!_context.Grade.Any(e => e.Id == grade.Id))
                     {
                         return NotFound();
                     }
@@ -189,14 +213,15 @@ namespace VDiary.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(IndexForLecturer));
+                return RedirectToAction(nameof(AllGradeForSubject), new { id = subjectId });
             }
             ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Name", grade.SubjectId);
             ViewData["UserId"] = new SelectList(_context.User, "Id", "AlbumNumber", grade.UserId);
-            return View(grade);
+            return View();
         }
 
         // GET: Marks/Delete/5
+        [Authorize(Roles = "Lecturer")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -227,11 +252,6 @@ namespace VDiary.Controllers
             return RedirectToAction(nameof(IndexForLecturer));
         }
 
-        private bool MarkExists(int id)
-        {
-            return _context.Grade.Any(e => e.Id == id);
-        }
-
         public async Task<IActionResult> AllGradeForSubject(int? id)
         {
             if (id is null)
@@ -259,6 +279,5 @@ namespace VDiary.Controllers
 
             return View(grades);
         }
-
     }
 }

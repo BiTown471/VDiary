@@ -5,6 +5,7 @@
     ViewData["Title"] = "IndexForLecturer";
     var students = ViewBag.Students;
     var subject = ViewBag.Subject;
+    var subjectid = subject.Id;
 }
 
 <h1>These are all grades from  @subject.Name  </h1>
@@ -27,29 +28,37 @@
 
         @foreach (var student in @students)
         {
-            <tr>
-                <td>
-                    @student.FullName
-                </td>
+        <tr>
+            <td>
+                @student.FullName
+                
+            </td>
+            <td>
                 @foreach (var group in Model.GroupBy(item => item.User.FullName))
                 {
 
-                    if (@student.FullName == group.Key)
+                    @if (@student.FullName == group.Key)
                     {
 
 
-                        <td>
-                            @foreach (var item in group)
-                            {
 
-                                @Html.DisplayFor(modelItem => item.GradeMark)
-                                @:&nbsp;
-                            }
-                        </td>
+                        @foreach (var item in group)
+                        {
+                           
+                            @Html.DisplayFor(modelItem => item.GradeMark)
+                           
+                            @:&nbsp;
+                        }
+
+
                     }
+                    
 
                 }
-            </tr>
+            </td>
+            <td>
+                <a asp-action="AllGradesOfStudent" asp-route-studentId="@student.Id" asp-route-subjectId="@subjectid">Edit</a></td>
+        </tr>
         }
     </tbody>
 </table>

@@ -1,0 +1,39 @@
+﻿@model IEnumerable<VDiary.Models.Presence>
+
+@{
+    ViewData["Title"] = "AllPresencesOfStudent";
+}
+
+<h1>All presences of @Model.FirstOrDefault().User.FullName</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Time)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Active)
+        </th>
+
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Time)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Active)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-action="PresencesForSubject" asp-route-subjectId="@Model.FirstOrDefault().Course.SubjectId">Back </a>

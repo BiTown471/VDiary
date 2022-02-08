@@ -18,12 +18,10 @@ namespace VDiary.Controllers
     [Authorize]
     public class CoursesController : Controller
     {
-        private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
 
-        public CoursesController(ApplicationDbContext context,IMapper mapper)
+        public CoursesController(ApplicationDbContext context)
         {
-            _mapper = mapper;
             _context = context;
         }
 
@@ -33,7 +31,7 @@ namespace VDiary.Controllers
             
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
-            int pageSize = 10;
+            int pageSize = 5;
 
             if (pageNumber is null)
             {
@@ -46,7 +44,10 @@ namespace VDiary.Controllers
                 .ToListAsync();
             if (userRole == "Lecturer")
             {
-                applicationDbContext = applicationDbContext.Where(c => c.Lecturer.Id == userId).ToList();
+                applicationDbContext = applicationDbContext
+                    .Where(c => c.Lecturer.Id == userId)
+                    .Distinct()
+                    .ToList();
             }
 
             if (userRole == "Student")
@@ -54,10 +55,10 @@ namespace VDiary.Controllers
                 applicationDbContext = await _context.Presence
                     .Where(p => p.UserId == userId)
                     .Select(p => p.Course)
+                    .Distinct()
                     .OrderBy(c => c.Time)
                     .ToListAsync();
             }
-            
             var pList = new PaginatedList<Course>(applicationDbContext, applicationDbContext.Count, pageNumber ?? 1, pageSize);
             ViewData["HasPreviousPage"] = pList.HasPreviousPage;
             ViewData["HasNextPage"] = pList.HasNextPage;
@@ -257,7 +258,7 @@ namespace VDiary.Controllers
                     }
                     catch (DbUpdateConcurrencyException)
                     {
-                        if (!CourseExists(courseToUpdate.Id))
+                        if (!_context.Course.Any(e => e.Id == id))
                         {
                             return NotFound();
                         }
@@ -307,11 +308,6 @@ namespace VDiary.Controllers
             return RedirectToAction(nameof(Index),new{id = course.LecturerId});
         }
 
-        private bool CourseExists(int id)
-        {
-            return _context.Course.Any(e => e.Id == id);
-        }
-
         // GET: Courses/ShowMembers/5
         public async Task<IActionResult> ShowMembers(int? courseId, int? subjectId,int? lecturerId)
         {
@@ -356,7 +352,7 @@ namespace VDiary.Controllers
             var useres =  await _context.User
                 .Include(u => u.SubjectUser)
                 .Where(u => u.Role.Id == 3)
-                .Where(u=>u.SubjectUser.All(su => su.SubjectId != id))
+                .Where(u => u.SubjectUser.All(su => su.BelongsTo != lecturer))
                 .ToListAsync();
             ViewData["Students"] = new SelectList(useres, "Id", "FullName"); 
             

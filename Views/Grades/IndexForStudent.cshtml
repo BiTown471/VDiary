@@ -25,7 +25,6 @@
         <tr>
             <td>
                 @subject.Name
-
             </td>
             <td>
                 @foreach (var group in Model.GroupBy(item => item.Subject.Name))
@@ -36,15 +35,12 @@
                         {
 
                             @Html.DisplayFor(modelItem => item.GradeMark)
-
+                            @:&nbsp;
                         }
                     }
                 }
             </td>
-            <td>
-                <a asp-controller="Presences" asp-action="PresencesForSubject" asp-route-subjectId="@subject.Id">Show presence</a>
-            </td>
-            </tr>
+        </tr>
     }
     </tbody>
 </table>

@@ -68,13 +68,19 @@
                 <td>
                     @if (userRole != "Student")
                     {
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit </a>
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                        <a asp-action="ShowMembers" asp-route-courseId="@item.Id" asp-route-subjectId="@item.SubjectId" asp-route-lecturerId="@item.LecturerId">Show members</a>
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a><a> | </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a><a> | </a>
+                        <a asp-action="ShowMembers" asp-route-courseId="@item.Id" asp-route-subjectId="@item.SubjectId" asp-route-lecturerId="@item.LecturerId">Show members</a><a> | </a>
+                        @if (userRole == "Lecturer")
+                        {
+                            <a asp-controller="Grades" asp-action="Create" asp-route-id="@item.SubjectId">Add grade</a><a> | </a>
+                            <a asp-controller="Presences" asp-action="PresencesForCourse" asp-route-subjectId="@item.SubjectId" asp-route-courseId="@item.Id">Check Presences</a><a> | </a>
+                        }
                     }
-                    @*<a asp-controller="Presences" asp-action="PresencesForCourse" asp-route-courseId="@item.Id" asp-route-subjectId="@item.SubjectId" asp-route-lecturerId="@item.LecturerId">Show presences</a>*@
-                    <a asp-controller="Presences" asp-action="PresencesForSubject" asp-route-subjectId="@item.SubjectId">Show presences</a>
+                    @if (userRole != "Lecturer")
+                    {
+                        <a asp-controller="Presences" asp-action="PresencesForSubject" asp-route-subjectId="@item.SubjectId" asp-route-lecturerId="@item.Lecturer.Id">Show presences</a>
+                    }
                 </td>
             </tr>
         }

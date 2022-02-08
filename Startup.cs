@@ -9,8 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VDiary.Data;
+using VDiary.Models;
 
 namespace VDiary
 {
@@ -35,14 +37,16 @@ namespace VDiary
                 });
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("VDiary")));
-
             services.AddAutoMapper(this.GetType().Assembly);
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<Seed>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,Seed seeder)
         {
+            
+
             seeder.SeederAll();
             if (env.IsDevelopment())
             {

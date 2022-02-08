@@ -6,9 +6,7 @@
 
 <h1>My Course</h1>
 
-@*<p>
-    <a asp-action="Create">Add new Grade</a>
-</p>*@
+
 <table class="table">
     <thead>
         <tr>
@@ -27,7 +25,7 @@
             </td>
             <td>
                 <a asp-action="AllGradeForSubject" asp-route-id="@item.Id">Show grades</a> |
-                <a asp-controller="Presences" asp-action="PresencesForSubject"  asp-route-subjectId="@item.Id">Show presence</a>
+                <a asp-controller="Presences" asp-action="PresencesForSubject"  asp-route-subjectId="@item.Id" asp-route-lecturerId="@ViewBag.lecturerId">Show presence</a>
             </td>
             
                 

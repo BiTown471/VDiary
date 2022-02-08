@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using VDiary.Models;
 
 namespace VDiary.Controllers
 {
+    [Authorize]
     public class PresencesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,40 +23,35 @@ namespace VDiary.Controllers
         }
 
         // GET: Presences
-        public async Task<IActionResult> Index()
+        [Authorize(Roles = "Lecturer")]
+        public async Task<IActionResult> AllPresencesOfStudent(int studentId, int subjectId)
         {
-            return View(await _context.Presence.ToListAsync());
-        }
 
-        // GET: Presences/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            if (studentId == null)
             {
                 return NotFound();
             }
 
-            var presence = await _context.Presence
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (presence == null)
-            {
-                return NotFound();
-            }
+            var results =  await _context.Presence
+                .Include(p => p.User)
+                .Include(p => p.Course)
+                .Where(p => p.UserId == studentId)
+                .Where(p => p.Course.SubjectId == subjectId)
+                .ToListAsync()
+                
+                ;
 
-            return View(presence);
+            return View(results);
         }
 
         // GET: Presences/Create
-        public IActionResult Create(int? courseId, int? subjectId, int? lecturerId)
+        [Authorize(Roles = "Lecturer")]
+
+        public IActionResult CheckPresence(int? courseId, int? subjectId)
         {
             if (subjectId == null)
             {
                 return NotFound();
-            }
-
-            if (lecturerId == null)
-            {
-                lecturerId = _context.Course.FirstOrDefault(c => c.Id == courseId).LecturerId;
             }
 
             var presences = _context.Presence
@@ -62,9 +59,9 @@ namespace VDiary.Controllers
                     .Where(p => p.CourseId == courseId)
                     .ToList()
                 ;
-            
 
-             return View(presences);
+
+            return View(presences);
         }
 
         // POST: Presences/Create
@@ -72,9 +69,10 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CourseId,UserId,Active,Course,User")] List<Presence> presences)
+        [Authorize(Roles = "Lecturer")]
+        public async Task<IActionResult> CheckPresence([Bind("Id,CourseId,UserId,Active,Course,User")] List<Presence> presences)
         {
-            
+
             if (ModelState.IsValid)
             {
                 foreach (var presence in presences)
@@ -85,10 +83,10 @@ namespace VDiary.Controllers
                 await _context.SaveChangesAsync();
                 var course = _context.Course
                     .First(c => c.Id == presences.FirstOrDefault().CourseId)
-                    
+
                     ;
 
-                return RedirectToAction("PresencesForCourse",new
+                return RedirectToAction("PresencesForCourse", new
                 {
                     courseId = course.Id,
                     subjectId = course.SubjectId
@@ -98,6 +96,7 @@ namespace VDiary.Controllers
         }
 
         // GET: Presences/Edit/5
+        [Authorize(Roles = "Lecturer")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -105,7 +104,8 @@ namespace VDiary.Controllers
                 return NotFound();
             }
 
-            var presence = await _context.Presence.FindAsync(id);
+            var presence = await _context.Presence
+                .FindAsync(id);
             if (presence == null)
             {
                 return NotFound();
@@ -118,12 +118,16 @@ namespace VDiary.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Lecturer")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CourseId,UserId,Active")] Presence presence)
         {
             if (id != presence.Id)
             {
                 return NotFound();
             }
+
+            var contextDb = _context.Course
+                .SingleOrDefaultAsync(p => p.Id == presence.CourseId);
 
             if (ModelState.IsValid)
             {
@@ -134,7 +138,7 @@ namespace VDiary.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PresenceExists(presence.Id))
+                    if (!_context.Presence.Any(e => e.Id == presence.Id))
                     {
                         return NotFound();
                     }
@@ -143,43 +147,9 @@ namespace VDiary.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(AllPresencesOfStudent),new {studentId = presence.UserId, subjectId = contextDb.Result.SubjectId});
             }
             return View(presence);
-        }
-
-        // GET: Presences/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var presence = await _context.Presence
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (presence == null)
-            {
-                return NotFound();
-            }
-
-            return View(presence);
-        }
-
-        // POST: Presences/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var presence = await _context.Presence.FindAsync(id);
-            _context.Presence.Remove(presence);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool PresenceExists(int id)
-        {
-            return _context.Presence.Any(e => e.Id == id);
         }
 
         public async Task<IActionResult> PresencesForCourse(int? courseId , int? subjectId)
@@ -208,10 +178,9 @@ namespace VDiary.Controllers
                 ;
 
             return View(presences);
-            //return View();
         }
 
-        public IActionResult PresencesForSubject( int? subjectId)
+        public IActionResult PresencesForSubject( int? subjectId,int? lecturerId)
         {
             var presents = _context.Presence
                 .Include(p => p.Course)
@@ -220,9 +189,9 @@ namespace VDiary.Controllers
                 .Where(p => p.Course.SubjectId == subjectId)
                 .OrderBy(p => p.Time)
                 ;
-            
+            ViewData["Lecturer"] = _context.User.FirstOrDefault( c => c.Id == lecturerId);
             var userRole = User.FindFirstValue(ClaimTypes.Role);
-
+            ViewData["Subject"] = _context.Subject.FirstOrDefault(s => s.Id== subjectId);
             if (userRole == "Student")
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -233,7 +202,8 @@ namespace VDiary.Controllers
             return View(presents);
         }
 
-        public async Task<IActionResult> PresencesForStudentAsync(int? pageNumber)
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> PresencesForStudent(int? pageNumber)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             ViewData["userFullName"] = User.FindFirstValue(ClaimTypes.Name);
@@ -252,8 +222,6 @@ namespace VDiary.Controllers
                     .AsEnumerable()
                     .ToList()
                 ;
-
-
             var su = new PaginatedList<SubjectUser>(applicationDbContext, applicationDbContext.Count, pageNumber ?? 1, pageSize);
             ViewData["HasPeireviousPage"] = su.HasPreviousPage;
             ViewData["HasNextPage"] = su.HasNextPage;

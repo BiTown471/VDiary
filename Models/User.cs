@@ -17,7 +17,6 @@ namespace VDiary.Models
         [MaxLength(55)]
         public string FirstName { get; set; }
         [MinLength(6)]
-        [MaxLength(16)]
         public string Password { get; set; }
         [Display(Name = "Email")]
         [Required]

@@ -148,7 +148,6 @@ C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Home\Privacy.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Roles\Create.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Roles\Delete.cshtml.g.cs
-C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Roles\Details.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Roles\Edit.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Roles\Index.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Shared\Error.cshtml.g.cs
@@ -177,9 +176,17 @@ C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Grades\AllGradeForSubject.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Grades\IndexForLecturer.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\PresencesForCourse.cshtml.g.cs
-C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\Create.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\VDiary.csproj.AssemblyReference.cache
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\presencesForSubject.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\PresencesForStudent.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Users\ChangePassword.cshtml.g.cs
 C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Subjects\Details.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Home\CreateAccount.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\bin\Debug\net5.0\MailKit.dll
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\bin\Debug\net5.0\MimeKit.dll
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\bin\Debug\net5.0\BouncyCastle.Crypto.dll
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Home\ForgotPassword.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Grades\AllGradesOfStudent.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\AllPresencesOfStudent.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\Edit.cshtml.g.cs
+C:\Users\user\Desktop\Praca inżynierska\v1\VDiary\VDiary\obj\Debug\net5.0\Razor\Views\Presences\CheckPresence.cshtml.g.cs

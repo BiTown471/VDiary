@@ -28,26 +28,6 @@ namespace VDiary.Controllers
             return View(await _context.Role.ToListAsync());
         }
 
-        // GET: Roles/Details/5
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var role = await _context.Role
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            return View(role);
-        }
-
         // GET: Roles/Create
         public IActionResult Create()
         {
@@ -113,7 +93,7 @@ namespace VDiary.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RoleExists(roleToUpdate.Id))
+                    if (!_context.Role.Any(e => e.Id == roleToUpdate.Id))
                     {
                         return NotFound();
                     }
@@ -128,7 +108,6 @@ namespace VDiary.Controllers
         }
 
         // GET: Roles/Delete/5
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -149,7 +128,6 @@ namespace VDiary.Controllers
         // POST: Roles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var role = await _context.Role.FindAsync(id);
@@ -158,9 +136,5 @@ namespace VDiary.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool RoleExists(int id)
-        {
-            return _context.Role.Any(e => e.Id == id);
-        }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -17,17 +19,21 @@ namespace VDiary.Controllers
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IPasswordHasher<User> _hasher;
 
-        public UsersController(ApplicationDbContext context)
+        public UsersController(ApplicationDbContext context,IPasswordHasher<User> passwordHasher)
         {
             _context = context;
+            _hasher = passwordHasher;
         }
 
         // GET: Users
         [Authorize(Roles= "Admin")]
         public async Task<IActionResult> Index()
         {
+            var seed = new SeedForUser(_context);
             var applicationDbContext = _context.User.Include(u => u.Role);
+            //seed.SeederAll(81000);
 
             return View(await applicationDbContext.ToListAsync());
         }
@@ -74,8 +80,8 @@ namespace VDiary.Controllers
             {
                 ViewBag.data = items.Where(r => r.Name == "Student");
             }
+            
 
-           // ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id");
             return View();
         }
 
@@ -94,7 +100,7 @@ namespace VDiary.Controllers
             user.IsDeleted = false;
             user.FilledLoginAtemps = 0;
             user.MaxLoginAttemps = 5;
-            user.Password = DefaultPassword();
+            user.Password = _hasher.HashPassword(user, DefaultPassword()); 
 
 
             if (ModelState.IsValid)
@@ -106,6 +112,7 @@ namespace VDiary.Controllers
             ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id", user.RoleId);
             return View(user);
         }
+
         public async Task<IActionResult> ChangePassword(int? id)
         {
             if (id == null)
@@ -129,46 +136,37 @@ namespace VDiary.Controllers
 
         [HttpPost, ActionName("ChangePassword")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePasswordPost(int? id)
+        public async Task<IActionResult> ChangePasswordPost(int? id,User user,string passwordR)
         {
             if (id is null)
             {
                 return NotFound();
             }
+            if (passwordR.Contains(" "))
+            {
+                TempData["Error"] = "Password can not contains spaces";
+                user = _context.User.FirstOrDefault(u => u.Id == id);
+                return View(user);
+            }
 
+            if (user.Password != passwordR)
+            {
+                TempData["Error"] = "Passwords must be the same ";
+                user = _context.User.FirstOrDefault(u =>u.Id == id);
+                return View(user);
+            }
+
+           
             var userToUpdate = await _context.User.FirstOrDefaultAsync(u => u.Id == id);
+            userToUpdate.Password = _hasher.HashPassword(userToUpdate, user.Password);
             if (ModelState.IsValid)
             {
-                if (await TryUpdateModelAsync<User>(
-                    userToUpdate,
-                    "",
-                    u => u.Password                    
-                    )                    
-                )
-                {
-                    try
-                    {
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!UserExists(userToUpdate.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                }
-
+                _context.User.Update(userToUpdate);
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Details", new { id = userToUpdate.Id });
             }
-           // ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id", userToUpdate.RoleId);
             return View(userToUpdate);
         }
-
 
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -210,38 +208,12 @@ namespace VDiary.Controllers
             }
 
             var userToUpdate = await _context.User.FirstOrDefaultAsync(u => u.Id == id);
+            userToUpdate.Password = _hasher.HashPassword(userToUpdate, userToUpdate.Password);
             if (ModelState.IsValid)
             {
-                if (await TryUpdateModelAsync<User>(
-                    userToUpdate,
-                    "",
-                    u => u.FirstName,
-                    u => u.Surname,
-                    u => u.Password,
-                    u => u.Email,
-                    u => u.IsDeleted,
-                    u => u.Signature,
-                    u => u.Role
-                ))
-                {
-                    try
-                    {
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!UserExists(userToUpdate.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                }
-                
-                return RedirectToAction("Details",new {id = userToUpdate.Id});
+                _context.User.Update(userToUpdate);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Details", new { id = userToUpdate.Id });
             }
             ViewData["RoleId"] = new SelectList(_context.Role, "Id", "Id", userToUpdate.RoleId);
             return View(userToUpdate);
@@ -283,11 +255,6 @@ namespace VDiary.Controllers
             _context.User.Remove(user);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.User.Any(e => e.Id == id);
         }
 
         private string DefaultPassword()

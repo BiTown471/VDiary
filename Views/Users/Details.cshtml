@@ -82,8 +82,7 @@
     @if (@Model.Role.Name == "Admin")
     {
         <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a><a> | </a>
-        @*<a asp-action="ChangePassword" asp-route-id="@Model.Id">Change password</a>*@ 
     }
     <a asp-action="ChangePassword" asp-route-id="@Model.Id">Change password</a> |
-    <a asp-controller="Courses" asp-action="Index" asp-route-id="@userId">Back to Courses</a>
+    <a asp-controller="Courses" asp-action="Index" asp-route-id="@userId">Back to schedule</a>
 </div>

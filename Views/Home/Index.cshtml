@@ -3,36 +3,47 @@
 @{
     ViewData["Title"] = "Home Page";
     var error = TempData["Error"] as string;
+    var success = TempData["Success"] as string;
 }
 
-<div class="text-center">
+<div class="text-sm-center">
     <h1 class="display-4">Login</h1>
-    @if (!string.IsNullOrEmpty(error))
-    {
-        <h1 class="alert-danger">@error</h1>
-    }
-    <div class="col-md-4 align-content-center">
-    @if (User.Identity.IsAuthenticated)
-    {
-        @Html.ActionLink("","Index","Courses")
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <h1 class="alert-danger">@error</h1>
+        }
+    
+        @if (User.Identity.IsAuthenticated)
+        {
+            @Html.ActionLink("", "Index", "Courses")
 
-    }
-        <form asp-action="LoginUser" >
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control"/>
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" type="password" class="form-control"/>
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
+        }
+        @if (!string.IsNullOrEmpty(success))
+        {
+            <h1 class="alert-success">@success</h1>
+        }
+            <div class="container-sm">
+                <form asp-action="LoginUser">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Password" class="control-label"></label>
+                        <input asp-for="Password" type="password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
 
-            <div class="form-group">
-                <input type="submit" value="Sign in" class="btn btn-primary"/>
+                    <div class="form-group">
+                        <input type="submit" value="Sign in" class="btn btn-primary" />
+                    </div>
+                    <div>
+                        <a asp-action="CreateAccount">Create account</a> |
+                        <a asp-action="ForgotPassword">Forgot password?</a>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
+    
 </div>

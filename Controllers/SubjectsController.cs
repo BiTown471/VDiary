@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,6 @@ namespace VDiary.Controllers
         {
             return View(await _context.Subject.ToListAsync());
         }
-
 
         // GET: Subjects/Create
         public IActionResult Create()
@@ -102,7 +102,7 @@ namespace VDiary.Controllers
                     }
                     catch (DbUpdateConcurrencyException)
                     {
-                        if (!SubjectExists(subjectToUpdate.Id))
+                        if (!_context.Subject.Any(e => e.Id == subjectToUpdate.Id))
                         {
                             return NotFound();
                         }
@@ -152,11 +152,6 @@ namespace VDiary.Controllers
                 _context.SubjectUser.Remove(relation);
             }
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool SubjectExists(int id)
-        {
-            return _context.Subject.Any(e => e.Id == id);
         }
 
         public IActionResult Details(int? id)

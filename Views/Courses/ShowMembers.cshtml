@@ -27,13 +27,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.FullName)
             </th>
-            @*@if(userRole != "Student")
-            {
-                <th>
-                    @Html.DisplayNameFor(model => model.IsDeleted)
-                </th>
-                <th></th>
-            }*@
             <th></th>
             
         </tr>
@@ -47,10 +40,7 @@
                 </td>
                 @if(userRole != "Student")
                 {
-                    @*<td>
-                        @Html.DisplayFor(modelItem => item.IsDeleted)
-                    </td>*@
-                    
+
                     <td>
                         <form asp-action="DeleteStudentFromCourse" asp-route-courseId="@ViewData["CourseId"]" asp-route-id="@item.Id" asp-route-subjectId="@ViewData["SubjectId"]">
                             <input type="hidden" asp-for="@item.Id" />

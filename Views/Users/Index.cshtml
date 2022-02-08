@@ -1,13 +1,16 @@
-﻿@model IEnumerable<VDiary.Models.User>
+﻿@using System.Diagnostics
+@model IEnumerable<VDiary.Models.User>
 
 @{
     ViewData["Title"] = "Index";
+    Stopwatch stopWatch = new Stopwatch();
+    stopWatch.Start();
 }
 
 <h1>List of Users</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Add new user</a>
 </p>
 <table class="table">
     <thead>
@@ -28,28 +31,35 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AlbumNumber)
-            </td>
-            
-            <td>
-                @Html.DisplayFor(modelItem => item.IsDeleted)
-            </td>
-            
-            <td>
-                @Html.DisplayFor(modelItem => item.Role.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AlbumNumber)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsDeleted)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Role.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
+    @{
+        stopWatch.Stop();
+    }
+    
 </table>
+<p>Page load time @stopWatch.ElapsedMilliseconds  ms</p>
+@*@stopWatch.Stop();*@

@@ -13,9 +13,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Subject)
             </th>
-            @*<th>@Html.DisplayNameFor(model => model.)</th>*@
             <th>
-                @*@Html.DisplayNameFor(model => model.GradeMark)*@
             </th>
 
         </tr>
@@ -27,38 +25,8 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Subject.Name)
                 </td>
-                @*<td>
-                    @foreach (var group in Model.GroupBy(item => item.Subject.Name))
-                    {
-
-
-                        <td>
-                                @subject.Name
-                                @Html.DisplayFor(modelItem => group.Key)
-                            </td>
-
-                        @if (@subject.Name == group.Key)
-                        {
-                            @foreach (var item in group)
-                            {
-
-                                @Html.DisplayFor(modelItem => item.GradeMark)
-
-                            }
-                        }
-
-                        @foreach (var item in group)
-                            {
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.GradeMark)
-                                </td>
-                            }
-
-
-                    }
-                </td>*@
                 <td>
-                    <a asp-controller="Presences" asp-action="PresencesForSubject" asp-route-subjectId="@item.SubjectId">Show presence</a>
+                    <a asp-controller="Presences" asp-action="PresencesForSubject" asp-route-subjectId="@item.SubjectId" asp-route-lecturerId="@item.BelongsTo">Show presence</a>
                 </td>
             </tr>
         }
@@ -70,14 +38,14 @@
     var nextDisabled = !ViewBag.HasNextPage ? "disabled" : "";
 }
 
-<a asp-action="IndexForLecturer"
+<a asp-action="PresencesForSubject"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
    asp-route-pageNumber="@(ViewBag.PageIndex - 1)"
    asp-route-currentFilter="@ViewData["CurrentFilter"]"
    class="btn btn-default @prevDisabled">
     Previous
 </a>
-<a asp-action="IndexForLecturer"
+<a asp-action="PresencesForSubject"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
    asp-route-pageNumber="@(ViewBag.PageIndex + 1)"
    asp-route-currentFilter="@ViewData["CurrentFilter"]"
